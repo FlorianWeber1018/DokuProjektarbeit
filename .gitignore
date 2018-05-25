@@ -227,13 +227,13 @@ TSWLatexianTemp*
 
 #*.png
 #*.PNG
-*.pdf
-*.PDF
+#*.pdf
+#*.PDF
 *.htm
 *.html
 #*.xcf
 #*.jpg
 #*.JPG
 *.svg
-*.pptx
+#*.pptx
 # End of https://www.gitignore.io/api/latex
