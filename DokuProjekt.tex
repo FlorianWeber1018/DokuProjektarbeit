@@ -27,8 +27,21 @@
 \listoffigures		%Bildverzeichnis
 \newpage
 
-\section{Einleitung}
-\subsection{Zielsetzung}
+\section{Vorwort}
+Zu Beginn des Projekts war die Carrera Bahn auf dem Stand, dass die Fahrzeuge konventionell sowie automatisiert gesteuert werden konnten. Außerdem war die Rundenzeitmessung und Visualisierung bereits realisiert. Bei der Energieversorgung konnte zwischen Solarstrom und Netzversorgung gewählt werden.
+Die Solarstromversorgung wurde pro Bahn durch 2 Solarpanels und einem Tiefsetzsteller mit konstantem Dutycycle hergestellt, die Netzstromversorgung mit einem 15V Schaltnetzteil.
+
+Die Manuelle Steuerung durch den Nutzer wurde realisiert, indem man die klassischen Carrera Drücker, als Variablen Vorwiderstand eingesetzt hat. Im automatisierten Modus musste ein Potentiometer bedient, um die langsame Geschwindigkeit des Autos einzustellen.
+In den schnellen Abschnitten der Strecke wurde dieses Poti  durch ein Relais gebrückt und die volle Versorgungsspannung lag an dem Auto an.
+\subsection{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}
+Der im Vorwort grob erwähnte Aufbau der vorhandenen Anlage wies einige Probleme auf:
+\begin{itemize}
+	\item 1. Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt.(Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung allerdings nicht)
+	\item 2. Drift der durch den Poti erzeugten Spannung im automatisierten Modus (Temperaturdrift)
+	\item 3. Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
+	\item Manchmal wird durch einen Aliasingeffekt das Überschreiten eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten.
+\end{itemize}
+Die Oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst werden.
 \newpage
 
 \section{Funktion - Hardware}
