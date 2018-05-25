@@ -12,7 +12,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage[colorlinks, pdfpagelabels, pdfstartview = FitH, bookmarksopen = true, bookmarksnumbered = true, linkcolor = black, plainpages = false, hypertexnames = false, citecolor = black] {hyperref}
-\parindent 0pt	
+\parindent 0pt
 
 
 \title{Dokumentation der Projektarbeit}
@@ -34,18 +34,18 @@
 \section{Funktion - Hardware}
 	Im Folgenden wird der grundlegende Aufbau der Carrera Bahn erklärt.
 
-	Diese Beschreibung ist immer nur für Bahn-A, da die 
-	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung 
+	Diese Beschreibung ist immer nur für Bahn-A, da die
+	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
 	\ref{img:carrerakomplett} Bezug genommen.
 	\begin{figure}[h]
 		\centering
-		\includegraphics[width=0.85\textwidth]{bilder/signalfluss.pdf}
+		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
 		\caption{Signalfluss}
 		\label{img:signalfluss}
 	\end{figure}
 	\begin{figure}[h]
 	\centering
-	\includegraphics[width=0.85\textwidth]{bilder/Carrerabahnroh.png}
+	\includegraphics[width=0.85\textwidth]{rec/Carrerabahnroh.png}
 	\caption{Überblick über die Carrera-Bahn}
 	\label{img:carrerakomplett}
 	\end{figure}
@@ -61,7 +61,7 @@
 	\subsection{Bedienschnittstelle}
 		\begin{figure}[h]
 			\centering
-			\includegraphics[width=0.85\textwidth]{bilder/hid.png}
+			\includegraphics[width=0.85\textwidth]{rec/hid.png}
 			\caption{Bedienschnittstelle}
 			\label{img:hid}
 		\end{figure}
@@ -77,46 +77,46 @@
 		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per Uart die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung.
 		Die Visualisierung war zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\subsection{Tiefsetzsteller}
-		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Bahnen. 
-		Jeder bekommt sein PWM-Signal(Steuergröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine 
-		Strommessung realisiert. Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter 
-		verarbeitet und ist lediglich für weiterführende Projekte gedacht. Da die Ausgangsspannung des 
-		Tiefsetzstellers größer sein kann wie die Referenzspannung des ADC, 
-		wird diese über einen Spannungsteiler angepasst und auf einen Kanal des ADC geführt. 
+		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Bahnen.
+		Jeder bekommt sein PWM-Signal(Steuergröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine
+		Strommessung realisiert. Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
+		verarbeitet und ist lediglich für weiterführende Projekte gedacht. Da die Ausgangsspannung des
+		Tiefsetzstellers größer sein kann wie die Referenzspannung des ADC,
+		wird diese über einen Spannungsteiler angepasst und auf einen Kanal des ADC geführt.
 		Diese Spannung stellt die Regelgröße dar.
 	\newpage
 
 \section{Software}
 	\subsection{RaspberryPi}
-		
-		Bei der Software die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript. 
-		Dieses war zu Beginn der Projektarbeit bereits vorhanden und hat die Sensoren 
-		der Bahn parallel eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen 
+
+		Bei der Software die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
+		Dieses war zu Beginn der Projektarbeit bereits vorhanden und hat die Sensoren
+		der Bahn parallel eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen
 		und die Bestzeit ermittelt.\\
-		Dieses Skript wurde größtenteils übernommen und lediglich in der Richtung abgeändert, 
-		dass die Trigger-Signale der Sensoren nun über die Serielle Schnittstelle dem Pi mitgeteilt wurden. 
-		Desweiteren wurden diverse Bugs behoben wie zB die zu geringe Framerate der Visualisierung. 
+		Dieses Skript wurde größtenteils übernommen und lediglich in der Richtung abgeändert,
+		dass die Trigger-Signale der Sensoren nun über die Serielle Schnittstelle dem Pi mitgeteilt wurden.
+		Desweiteren wurden diverse Bugs behoben wie zB die zu geringe Framerate der Visualisierung.
 		Als serielle Schnittstelle wurde "ttyAMA0" benutzt.
-		\newpage	
+		\newpage
 	\subsection{Arduino}
-		Die Software des Arduinos wurde, wie oben bereits erwähnt, nicht in der Arduino Entwicklungsumgebung 
-		geschrieben. Stattdessen habe ich auf die IDE "AtmelStudio7" zurückgegriffen und den Mikrocontroller 
+		Die Software des Arduinos wurde, wie oben bereits erwähnt, nicht in der Arduino Entwicklungsumgebung
+		geschrieben. Stattdessen habe ich auf die IDE "AtmelStudio7" zurückgegriffen und den Mikrocontroller
 		per ISP beschrieben. Der Bootloader des Arduino musste dazu entfernt werden.
-		Gründe dazu waren unter anderem die Wahl der Sprache C++, 
-		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen(Timer, Hardwareinterrupts...). 
+		Gründe dazu waren unter anderem die Wahl der Sprache C++,
+		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen(Timer, Hardwareinterrupts...).
 		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern.\\
 		\subsubsection{Interupts}
 		\begin{figure}[h]
 			\centering
 			\begin{subfigure}{0.47\textwidth}
 				\centering
-				\includegraphics[width=1.1\textwidth]{bilder/Interrupt_Programme.png}
+				\includegraphics[width=1.1\textwidth]{rec/Interrupt_Programme.png}
 				\caption{Interruptgesteuerter \\Programmablauf}
-				\label{InterruptgesteuerterProgrammablauf}		
+				\label{InterruptgesteuerterProgrammablauf}
 			\end{subfigure}
 			\begin{subfigure}{0.47\textwidth}
 				\centering
-				\includegraphics[width=0.55\textwidth]{bilder/Sequentielle_Programme.png}
+				\includegraphics[width=0.55\textwidth]{rec/Sequentielle_Programme.png}
 				\caption{Sequentieller \\Programmablauf}
 				\label{SequentiellerProgrammablauf}
 			\end{subfigure}
@@ -156,7 +156,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			Analog zu diesem Sensor 0, ist dies für jeden Sensor sowie Taster realisiert. Die Belegung der benutzten Pin Change Interupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
 			\begin{table}[h]
 				\begin{tabular}{|l|l|l|}
-					\hline 
+					\hline
 					Zugehörigkeit & Signal & Bezeichnung\\
 					\hline
 					\hline
@@ -192,32 +192,32 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 				\caption{Belegung der Pin Change Interupts}
 				\label{tab:belegungpcint}
 			\end{table}
-			
+
 	\newpage
-	
+
 \section{Bedienungsanleitung}
 		Die Carrera-Bahn beherrscht 2 Modi.
 		\begin{itemize}
 			\item Manuelles Fahren
 			\item Automatisiertes Fahren
 		\end{itemize}
-		Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell 
+		Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell
 		gegen ein Automatisiertes Fahrzeug antreten kann.
-		Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen 
-		Tasters des gewählten Modus signalisiert. 
+		Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen
+		Tasters des gewählten Modus signalisiert.
 		Außerdem kann die Energieversorgung der Bahn mit dem Wechselschalter ausgewählt werden.
-		Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die 
+		Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die
 		Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
 	\subsection{Manuelles Fahren}
-		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die orginalen Carrera Handregler gesteuert 
-		werden. 
+		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die orginalen Carrera Handregler gesteuert
+		werden.
 	\subsection{Automatisiertes Fahren}
 		Der Automatisierte Modus ist aufgeschlüsselt in 2 Zustände:
 		\begin{itemize}
 			\item Auto-wait
 			\item Auto-run
 		\end{itemize}
-		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in 
+		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in
 		Auto-wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers wechselt das Auto in den Auto-run Zustand.
 		\subsubsection{Auto-run}
@@ -230,7 +230,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
 			In der Visualisierung ist 1. und 2. in Abschnitt-1 zusammegefasst. \\3. bildet dort Abschnitt-2.
 			\newpage
-			
+
 \newpage
 
 \section{Zusammenfassung}
