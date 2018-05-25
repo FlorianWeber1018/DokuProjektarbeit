@@ -1,0 +1,22 @@
+PCINT0
+	PCINT4:		Button:		set B Automatik
+	PCINT5:		Button:		set B Manuell
+	PCINT6:		Button:		set A Automatik
+PCINT1
+	PCINT9:		Button:		Reset A
+	PCINT10:	Button:		Reset B
+PCINT2
+	PCINT16:	Sensor:		sens0:	Bahn A, bei Start
+	PCINT17:	Sensor:		sens1:	Bahn A, vor Looping
+	PCINT18:	Sensor:		sens2:	Bahn A, nach Looping
+	PCINT19:	Sensor:		sens3:	Bahn B, bei Start
+	PCINT20:	Sensor:		sens4:	Bahn B, vor Looping
+	PCINT21:	Sensor:		sens5:	Bahn B, nach Looping
+	PCINT22:	Button:		Reset Pi
+Timer1_COMPB
+	interrupt routine nur nötig zum löschen von interrupt flag,
+	Hauptfunktion: ADC trigger	
+Timer3_COMPA
+	trigger der spannungsregelung
+Timer4_COMPA
+	trigger für softwaretimmer
