@@ -41,7 +41,7 @@ Der im Vorwort grob erwähnte Aufbau der vorhandenen Anlage wies einige Probleme
 	\item 3. Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
 	\item Manchmal wird durch einen Aliasingeffekt das Überschreiten eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten.
 \end{itemize}
-Die Oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst werden.
+Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst werden.
 \newpage
 
 \section{Funktion - Hardware}
@@ -113,7 +113,7 @@ Die Oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		\newpage
 	\subsection{Arduino}
 		Die Software des Arduinos wurde, wie oben bereits erwähnt, nicht in der Arduino Entwicklungsumgebung
-		geschrieben. Stattdessen habe ich auf die IDE "AtmelStudio7" zurückgegriffen und den Mikrocontroller
+		geschrieben. Stattdessen habe ich auf die IDE "AtmelStudio 7" zurückgegriffen und den Mikrocontroller
 		per ISP beschrieben. Der Bootloader des Arduino musste dazu entfernt werden.
 		Gründe dazu waren unter anderem die Wahl der Sprache C++,
 		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen(Timer, Hardwareinterrupts...).
@@ -207,20 +207,95 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			\end{table}
 
 	\newpage
+	\subsubsection{Timer}
+	Für Die Funktion der Steuerung werden viele Timer benötigt.\\
+	Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
+	Dieser erhält sein Takt von einem Hardwaretimer.
+	Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
+		\begin{table}[h]
+			\begin{tabular}{|l|l|l|}
+				\hline
+				\textbf{Timer} & \textbf{Funktion}\\
+				\hline
+				\hline
+				 & \\
+				Hardwaretimer &\\
+				\hline
+				\hline
+				Timer0 & Generierung der 2 PWM Kanäle für die Tiefsetzsteller\\
+				\hline
+				Timer1 & Auslösen der Analog Digital Wandlung\\
+				\hline
+				Timer2 & Ohne Verwendung\\
+				\hline
+				Timer3 & Trigger für Spannungsregelung\\
+				\hline
+				Timer4 & Trigger für Softwaretimer\\
+				\hline
+				\hline
+				 & \\
+				Softwaretimer &\\
+				\hline
+				\hline
+				0..1 & Zeitmessung Abschnitt 3 (Nach dem Looping $\rightarrow$ Startlinie)\\
+				\hline
+				2..7 & Entprellen der Bahnsensoren\\
+				\hline
+				8..14 & Entprellen der HID Taster\\
+				\hline
+				15..16 & Ohne Verwendung\\
+				\hline
+				17 & Trigger für Zeitmessung Resettaster\\
+				\hline
+			\end{tabular}
+			\caption{Belegung der Hard- sowie Softwaretimer}
+			\label{tab:belegungTimer}
+		\end{table}
+		\newpage
+	\subsubsection{Regler}
+		\begin{figure}[h]
+			\centering
+			\includegraphics[width=\textwidth]{rec/Regler.pdf}
+			\caption{Kaskadenreglung Bahngeschwindigkeit}
+			\label{img:Regelung}
+		\end{figure}
+		Die Regelung für die Bahngeschwindigkeit ist als Kaskadenregelung (Abbildung \ref{img:Regelung})ausgeführt.
+		Dem Führungsregler wird eine Sollzeit für Streckenabschnitt 3 vorgegeben, dieser gibt nun die Sollspannung für den Folgeregler vor.
+		Der Folgeregler hat als Stellgröße den Duty-Cycle des zugehörigen Tiefsetzstellers und regelt die Spannung auf der Schiene auf den gegebenen Wert.
+		Der Regelalgorithmus des Spannungsreglers wird in festen Zeitabständen, vorgegeben durch OCR3 (Overflow Compare Register Timer3), zyklisch aufgerufen.
+		Der Regelalgorithmus des Reglers der Bahngeschwindigkeit wird immer dann aufgerufen, wenn ein neuer Zeitwert für den Streckenabschnitt 3 vorliegt.
+		Dieses Vorgehen ist sehr störanfällig, allerdings ist es die einzige Möglichkeit, einen solche Regelung mit den vorhandenen Sensoren zu realisieren. \\
+		Der Vorfaktor des Führungsreglers ist eher verhältnismäßig klein gewählt, um ein Überschwingen möglichst zu verhindern.
+		Die gerade beschriebene Regelstrategie ist als solche nur im Automatik-Modus aktiv.\\
+		Im manuellen Modus wird die Sollspannung direkt durch den Handregler vorgegeben.
+		\newpage
+	\subsubsection{Analog Digital Wandler}
 
+		Der Mikrocontroller des Arduinos (Atmel Atmega 2560) hat bereits einen 10 bit ADC (Analog Digital Converter) auf dem Chip integriert, dass auf einen externen Wandler verzichtet werden kann.
+		Da der Wandler immer nur einen Messung durchführen kann, hat der Hersteller ein (MUX) Multiplexer integriert um zwischen den einzelnen ADC Pins des Mikrocontroller durchzuschalten.
+		Die Belegung der ADC Pins des Mikrocontrollers ist in Tabelle \ref{tab:AnhangBelegungArduino} enthalten.
+
+		Wenn die angestoßene Messung des ADC abgeschlossen ist, wird ein Interrupt ausgelöst.
+
+
+		Die Steuerung des Multiplexers erfolgt über ein Zustandsautomat der immer dann getriggert wird, wenn wenn die letzte Messung des ADC abgeschlossen ist.
+
+
+		\newpage
 \section{Bedienungsanleitung}
-		Die Carrera-Bahn beherrscht 2 Modi.
-		\begin{itemize}
-			\item Manuelles Fahren
-			\item Automatisiertes Fahren
-		\end{itemize}
-		Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell
-		gegen ein Automatisiertes Fahrzeug antreten kann.
-		Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen
-		Tasters des gewählten Modus signalisiert.
-		Außerdem kann die Energieversorgung der Bahn mit dem Wechselschalter ausgewählt werden.
-		Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die
-		Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
+	\begin{figure}[h]
+		\centering
+		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.png}
+		\caption{Zustandsautomat Betriebsmodi}
+		\label{img:Betriebsmodi}
+	\end{figure}
+	Die Carrera-Bahn beherrscht 2 Modi.
+	\begin{itemize}
+		\item Manuelles Fahren
+		\item Automatisiertes Fahren
+	\end{itemize}
+	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell gegen ein Automatisiertes Fahrzeug antreten kann. Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung der Bahn mit dem Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
+	Der Wechsel zwischen den Modi findet nach Abbildung \ref{img:Betriebsmodi} statt und ist in den jeweiligen Abschnitten genauer erklärt.
 	\subsection{Manuelles Fahren}
 		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die orginalen Carrera Handregler gesteuert
 		werden.
@@ -230,10 +305,11 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			\item Auto-wait
 			\item Auto-run
 		\end{itemize}
+		\subsubsection{Auto-Wait}
 		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in
 		Auto-wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers wechselt das Auto in den Auto-run Zustand.
-		\subsubsection{Auto-run}
+		\subsubsection{Auto-Run}
 			Im Auto-run Zustand fährt das Auto selbständig. Die Strecke ist in 3 Abschnitte unterteilt.
 			\begin{itemize}
 				\item{1.} Startlinie $\rightarrow$ Vor dem Looping
@@ -241,7 +317,8 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 				\item{3.} Nach dem Looping $\rightarrow$ Startlinie
 			\end{itemize}
 			Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
-			In der Visualisierung ist 1. und 2. in Abschnitt-1 zusammegefasst. \\3. bildet dort Abschnitt-2.
+			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping, sowie nach dem Looping bis zur Startlinie in Streckenabschnitt 1 zusammegefasst.
+			Die der Weg in dem Looping bildet dort Streckenabschnitt 2.
 			\newpage
 
 \newpage
@@ -254,6 +331,163 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 
 \section{Anhang}
 \subsection{Pinbelegung}
-\subsubsection{Arduino}
-\subsubsection{RaspberryPi}
+\subsubsection{Sub-D}
+\begin{table}[h]
+		\begin{tabular}{|l|l|}
+			\hline
+			\textbf{Sub-D Pin} &\textbf{Funktion}\\
+			\hline
+			\hline
+			1 & VCC (5V)\\
+			\hline
+			2 & GND\\
+			\hline
+			3 & -\\
+			\hline
+			4 & -\\
+			\hline
+			5 & -\\
+			\hline
+			6 & Sensor 0\\
+			\hline
+			7 & Sensor 1\\
+			\hline
+			8 & Sensor 2\\
+			\hline
+			9 & Sensor 3\\
+			\hline
+			10 & Sensor 4\\
+			\hline
+			11 & Sensor 5\\
+			\hline
+			12 & Schiene A - Plus\\
+			\hline
+			13 & Schiene A - Minus\\
+			\hline
+			14 & Schiene B - Plus\\
+			\hline
+			15 & Schiene B - Minus\\
+			\hline
+		\end{tabular}
+		\caption{Pinbelegung der Sub-D Buchse auf dem HID}
+		\label{tab:AnhangBelegungSUBD}
+	\end{table}
+	\subsubsection{Raspberry Pi}
+	\begin{table}[h]
+		\begin{tabular}{|l|l|}
+			\hline
+			\textbf{Raspberry Pin} &\textbf{Funktion}\\
+			\hline
+			\hline
+			1 & VCC MCU (3V3)\\
+			\hline
+			2 & VCC Input (5V)\\
+			\hline
+			3$\rightarrow$5 & -\\
+			\hline
+			6 & GND Input\\
+			\hline
+			7 & -\\
+			\hline
+			8 & -\\
+			\hline
+			9 & GND Uart\\
+			\hline
+			10 & RXD Uart\\
+			\hline
+			11$\rightarrow$40 & -\\
+			\hline
+		\end{tabular}
+		\caption{Pinbelegung GPIO RaspberryPi}
+		\label{tab:AnhangBelegungRPI}
+	\end{table}
+	\subsubsection{Arduino}
+	\begin{table}[hb]
+		\begin{tabular}{|l|l|l|}
+			\hline
+			\textbf{Arduino Pin} & \textbf{Atmel Pin} &\textbf{Funktion}\\
+			\hline
+			\hline
+			0 &  & Ohne Funktion\\
+			\hline
+			1 &  & Ohne Funktion\\
+			\hline
+			2 &  & Ohne Funktion\\
+			\hline
+			3 &  & Ohne Funktion\\
+			\hline
+			4 & OC0B & PWM Tiefsetzsteller Schiene B\\
+			\hline
+			5 &  & Ohne Funktion\\
+			\hline
+			6 &  & Ohne Funktion\\
+			\hline
+			7 &  & Ohne Funktion\\
+			\hline
+			8 &  & Ohne Funktion\\
+			\hline
+			9 &  & Ohne Funktion\\
+			\hline
+			10 & PCINT4 & Taster HID \glqq Schiene B - Automatik\grqq \\
+			\hline
+			11 & PCINT5 & Taster HID \glqq Schiene B - Manuell\grqq \\
+			\hline
+			12 & PCINT6 & Taster HID \glqq Schiene A - Automatik\grqq \\
+			\hline
+			13 &  OC0A & PWM Tiefsetzsteller Schiene A\\
+			\hline
+			14	& PCINT10	& Taster HID \\
+				&		& \glqq Schiene B - Reset Regler Bahngeschwindigkeit\grqq \\
+			\hline
+			15 	& PCINT9 	& Taster HID \\
+				&		& \glqq Schiene A - Reset Regler Bahngeschwindigkeit\grqq \\
+			\hline
+			16 &  & Ohne Funktion\\
+			\hline
+			17 &  & Ohne Funktion\\
+			\hline
+			18 &  & Ohne Funktion\\
+			\hline
+			19$\rightarrow$45 &  & Ohne Funktion\\
+			\hline
+			46 & PL3 & HID LED \glqq Schiene B - Manuell\\
+			\hline
+			47 & PL2 & HID LED \glqq Schiene B - Automatik\\
+			\hline
+			48 & PL1 & HID LED \glqq Schiene A - Manuell\\
+			\hline
+			49 & PL0 & HID LED \glqq Schiene A - Automatik\\
+			\hline
+			A1$\rightarrow$A0 & ADC1$\rightarrow$ADC0 & Shunt Tiefsetzsteller Schiene A\\
+			\hline
+			A3$\rightarrow$A2 & ADC3$\rightarrow$ADC2 & Shunt Tiefsetzsteller Schiene B\\
+			\hline
+			A4 & ADC4 & Spannung Schiene A\\
+			\hline
+			A5 & ADC5 & Spannung Schiene B\\
+			\hline
+			A6 & ADC6 & Carrera Handregler Schiene A\\
+			\hline
+			A7 & ADC7 & Carrera Handregler Schiene B\\
+			\hline
+			A8 & PCINT16 & Sensor 0 (Schiene A - Startlinie)\\
+			\hline
+			A9 & PCINT17 & Sensor 1 (Schiene A - vor dem Looping)\\
+			\hline
+			A10 & PCINT18 & Sensor 2 (Schiene A - nach dem Looping)\\
+			\hline
+			A11 & PCINT19 & Sensor 3 (Schiene B - Startlinie)\\
+			\hline
+			A12 & PCINT20 & Sensor 4 (Schiene B - vor dem Looping)\\
+			\hline
+			A13 & PCINT21 & Sensor 5 (Schiene B - nach dem Looping)\\
+			\hline
+			A14 & PCINT22 & Taster HID \glqq Reset Rundenzeit Visualisierung\grqq \\
+			\hline
+			A15 & PCINT23 & Taster HID \glqq Schiene A - Manuell\grqq \\
+			\hline
+		\end{tabular}
+		\caption{Pinbelegung des Arduino}
+		\label{tab:AnhangBelegungArduino}
+	\end{table}
 \end{document}
