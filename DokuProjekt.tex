@@ -1,4 +1,6 @@
-\documentclass[a4paper, 11pt]{scrartcl}
+\documentclass[a4paper, 11pt]{report}
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
 \usepackage{a4}
 
 
@@ -27,13 +29,13 @@
 \listoffigures		%Bildverzeichnis
 \newpage
 
-\section{Vorwort}
+\chapter{Vorwort}
 Zu Beginn des Projekts war die Carrera Bahn auf dem Stand, dass die Fahrzeuge konventionell sowie automatisiert gesteuert werden konnten. Außerdem war die Rundenzeitmessung und Visualisierung bereits realisiert. Bei der Energieversorgung konnte zwischen Solarstrom und Netzversorgung gewählt werden.
 Die Solarstromversorgung wurde pro Bahn durch 2 Solarpanels und einem Tiefsetzsteller mit konstantem Dutycycle hergestellt, die Netzstromversorgung mit einem 15V Schaltnetzteil.
 
 Die Manuelle Steuerung durch den Nutzer wurde realisiert, indem man die klassischen Carrera Drücker, als Variablen Vorwiderstand eingesetzt hat. Im automatisierten Modus musste ein Potentiometer bedient, um die langsame Geschwindigkeit des Autos einzustellen.
 In den schnellen Abschnitten der Strecke wurde dieses Poti  durch ein Relais gebrückt und die volle Versorgungsspannung lag an dem Auto an.
-\subsection{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}
+\section{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}
 Der im Vorwort grob erwähnte Aufbau der vorhandenen Anlage wies einige Probleme auf:
 \begin{itemize}
 	\item 1. Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt.(Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung allerdings nicht)
@@ -44,19 +46,19 @@ Der im Vorwort grob erwähnte Aufbau der vorhandenen Anlage wies einige Probleme
 Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst werden.
 \newpage
 
-\section{Funktion - Hardware}
+\chapter{Funktion - Hardware}
 	Im Folgenden wird der grundlegende Aufbau der Carrera Bahn erklärt.
 
 	Diese Beschreibung ist immer nur für Bahn-A, da die
 	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
 	\ref{img:carrerakomplett} Bezug genommen.
-	\begin{figure}[h]
+	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
 		\caption{Signalfluss}
 		\label{img:signalfluss}
 	\end{figure}
-	\begin{figure}[h]
+	\begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.85\textwidth]{rec/Carrerabahnroh.png}
 	\caption{Überblick über die Carrera-Bahn}
@@ -64,15 +66,15 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	\end{figure}
 	\newpage
 
-	\subsection{Sensoren}
+	\section{Sensoren}
 		Pro Schiene gibt es 3 Sensoren die als Gabellichtschranke ausgeführt sind. Sensor 0 befindet sich am Start, Sensor 1 vor dem Looping und 		Sensor 2 Nach dem Looping.\\
 
 		Sensor 0 wird im Wesentlichen nur zur Zeitmessung genutzt, dazu später mehr.
 		Sensor 1 wird genutzt um ein Signal zu generieren, so dass die Steuerung das Auto im Automatik-Modus für den Looping beschleunigen kann. 		Das Signal von Sensor 2 wird schließlich genutzt um nach dem Looping wieder die langsame Geschwindigkeit zu triggern.\\
 		Im manuellen Modus dienen die Sensoren nur zur Zeitmessung für die Visualisierung.
 		Da die Flanke nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen wurden die Hardware 		Pin Change Interrupts des Atmega2560 genutzt.
-	\subsection{Bedienschnittstelle}
-		\begin{figure}[h]
+	\section{Bedienschnittstelle}
+		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.85\textwidth]{rec/hid.png}
 			\caption{Bedienschnittstelle}
@@ -82,14 +84,14 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Der Wechselschalter ist zum Auswählen, ob die Bahn mit Energie aus den Solarpanels betrieben wird, oder mit Netzstrom. Ist Dieser in Mittelstellung, wird die Bahn nicht versorgt und das Auto steht - unabhängig des gewählten Modus.
 		Über Taster 0 beziehungsweise Taster 1 lässt sich der Modus der Bahn auswählen, welcher durch die LEDs bei den Tastern signalisiert wird. \\Hier steht Automatik und Manuell zur Auswahl.
 		Mit Taster 2 lässt sich der Regler der Bahngeschwindigkeit genauer -  Spannung außerhalb des Loopings, auf seinen Startwert zurücksetzen.
-	\subsection{Arduino}
+	\section{Arduino}
 		Beim Arduino handelt es sich um einen einfachen Arduino Mega 2560 ADK.\\
 		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, die bereits die wichtigsten Beschaltungen des Mikrocontroller enthält wie zum beispiel die Abblockcondensatoren an der Versorgungsspannung aber auch einen USB-Seriell Wandler den man nutzen kann um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
-	\subsection{RaspberryPi}
+	\section{RaspberryPi}
 		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per Uart die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung.
 		Die Visualisierung war zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
-	\subsection{Tiefsetzsteller}
+	\section{Tiefsetzsteller}
 		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Bahnen.
 		Jeder bekommt sein PWM-Signal(Steuergröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine
 		Strommessung realisiert. Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
@@ -99,8 +101,8 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Diese Spannung stellt die Regelgröße dar.
 	\newpage
 
-\section{Software}
-	\subsection{RaspberryPi}
+\chapter{Software}
+	\section{RaspberryPi}
 
 		Bei der Software die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
 		Dieses war zu Beginn der Projektarbeit bereits vorhanden und hat die Sensoren
@@ -111,15 +113,15 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Desweiteren wurden diverse Bugs behoben wie zB die zu geringe Framerate der Visualisierung.
 		Als serielle Schnittstelle wurde "ttyAMA0" benutzt.
 		\newpage
-	\subsection{Arduino}
+	\section{Arduino}
 		Die Software des Arduinos wurde, wie oben bereits erwähnt, nicht in der Arduino Entwicklungsumgebung
 		geschrieben. Stattdessen habe ich auf die IDE "AtmelStudio 7" zurückgegriffen und den Mikrocontroller
 		per ISP beschrieben. Der Bootloader des Arduino musste dazu entfernt werden.
 		Gründe dazu waren unter anderem die Wahl der Sprache C++,
 		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen(Timer, Hardwareinterrupts...).
 		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern.\\
-		\subsubsection{Interupts}
-		\begin{figure}[h]
+		\subsection{Interrupts}
+		\begin{figure}[ht]
 			\centering
 			\begin{subfigure}{0.47\textwidth}
 				\centering
@@ -141,33 +143,82 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			Dies hat den Vorteil, dass das Timing nichtmehr von der Länge der MainLoop abhängt und Dinge wie zum  Beispiel der Regelagorythmus immer in der selben Frequenz ausgeführt werden.
 			Interruptquellen des Programms sind:
 			\begin{itemize}
-				\item Timer
+				\item Timer  (Abschnitt \ref{subsubsec:Timer})
 				\begin{itemize}
 					\item[1.] Timer1, Compareregister B match
 					\item[2.] Timer3, Compareregister A match
 					\item[3.] Timer4, Compareregister A match
 				\end{itemize}
-				\item Pin Change Interrupts
+				\item Pin Change Interrupts (Abschnitt \ref{subsubsec:PCINT})
 				\begin{itemize}
 					\item[4.] PCINT0\underline{ }vect
 					\item[5.] PCINT1\underline{ }vect
 					\item[6.] PCINT2\underline{ }vect
 				\end{itemize}
+				\item Analog Digital Converter
+				\begin{itemize}
+					\item[7.] ADC\underline{ }vect
+				\end{itemize}
+
 			\end{itemize}
 			\newpage
 			Zu Anfang des Programms wird die ganze Peripherie initialisiert, und die Variablen mit ihren default Werten geladen.
 			Anschliesend werden die Interrupts global freigegeben. Ab hier ist die Steuerung Funktionsfähig.
-			Wenn ein Auto nun auf, Beispielsweise Sensor 0(Bahn A, am Start), fährt wird der Pegel kurze Zeit \emph{low} und nach verlassen des Sensors wieder \emph{high}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden:
-			\begin{itemize}
-				\item Durch welchen Pin das Interrupt ausgelöst wurde
+			\subsubsection{Timer}\label{subsubsec:Timer}
+			Für Die Funktion der Steuerung werden viele Timer benötigt.\\
+			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
+			Dieser erhält sein Takt von einem Hardwaretimer.
+			Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
+				\begin{table}[ht]
+					\begin{tabular}{|l|l|l|}
+						\hline
+						\textbf{Timer} & \textbf{Funktion}\\
+						\hline
+						\hline
+						 & \\
+						Hardwaretimer &\\
+						\hline
+						\hline
+						Timer0 & Generierung der 2 PWM Kanäle für die Tiefsetzsteller\\
+						\hline
+						Timer1 & Auslösen der Analog Digital Wandlung\\
+						\hline
+						Timer2 & Ohne Verwendung\\
+						\hline
+						Timer3 & Trigger für Spannungsregelung\\
+						\hline
+						Timer4 & Trigger für Softwaretimer\\
+						\hline
+						\hline
+						 & \\
+						Softwaretimer &\\
+						\hline
+						\hline
+						0..1 & Zeitmessung Abschnitt 3 (Nach dem Looping $\rightarrow$ Startlinie)\\
+						\hline
+						2..7 & Entprellen der Bahnsensoren\\
+						\hline
+						8..14 & Entprellen der HID Taster\\
+						\hline
+						15..16 & Ohne Verwendung\\
+						\hline
+						17 & Trigger für Zeitmessung Resettaster\\
+						\hline
+					\end{tabular}
+					\caption{Belegung der Hard- sowie Softwaretimer}
+					\label{tab:belegungTimer}
+				\end{table}
+			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
+			Wenn ein Auto nun auf, Beispielsweise Sensor 0(Bahn A, am Start), fährt wird der Pegel kurze Zeit \emph{low} und nach verlassen des Sensors wieder \emph{high}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
+			Außerdem gibt es die zwei Möglichkeiten:
 				\begin{itemize}
 					\item war es ein High $\rightarrow$ Low Übergang
 					\item war es ein Low $\rightarrow$ High Übergang
 				\end{itemize}
-			\end{itemize}
+
 			Zum Entprellen des Eingangs wird direkt, nachdem das Event gehandelt wurde, der Eingang deaktiviert. Danach wird ein Software-Timer gestartet der den Eingang nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass wenn das Auto beim Überahren des Sensors das dementsprechende Event nur einmal triggert.
-			Analog zu diesem Sensor 0, ist dies für jeden Sensor sowie Taster realisiert. Die Belegung der benutzten Pin Change Interupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
-			\begin{table}[h]
+			Analog zu diesem Sensor 0, ist dies für jeden Sensor sowie Taster realisiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
+			\begin{table}[ht]
 				\begin{tabular}{|l|l|l|}
 					\hline
 					Zugehörigkeit & Signal & Bezeichnung\\
@@ -202,58 +253,14 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 											& PCINT23 & Button: A-Manuell\\
 					\hline
 				\end{tabular}
-				\caption{Belegung der Pin Change Interupts}
+				\caption{Belegung der Pin Change Interrupts}
 				\label{tab:belegungpcint}
 			\end{table}
 
-	\newpage
-	\subsubsection{Timer}
-	Für Die Funktion der Steuerung werden viele Timer benötigt.\\
-	Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
-	Dieser erhält sein Takt von einem Hardwaretimer.
-	Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
-		\begin{table}[h]
-			\begin{tabular}{|l|l|l|}
-				\hline
-				\textbf{Timer} & \textbf{Funktion}\\
-				\hline
-				\hline
-				 & \\
-				Hardwaretimer &\\
-				\hline
-				\hline
-				Timer0 & Generierung der 2 PWM Kanäle für die Tiefsetzsteller\\
-				\hline
-				Timer1 & Auslösen der Analog Digital Wandlung\\
-				\hline
-				Timer2 & Ohne Verwendung\\
-				\hline
-				Timer3 & Trigger für Spannungsregelung\\
-				\hline
-				Timer4 & Trigger für Softwaretimer\\
-				\hline
-				\hline
-				 & \\
-				Softwaretimer &\\
-				\hline
-				\hline
-				0..1 & Zeitmessung Abschnitt 3 (Nach dem Looping $\rightarrow$ Startlinie)\\
-				\hline
-				2..7 & Entprellen der Bahnsensoren\\
-				\hline
-				8..14 & Entprellen der HID Taster\\
-				\hline
-				15..16 & Ohne Verwendung\\
-				\hline
-				17 & Trigger für Zeitmessung Resettaster\\
-				\hline
-			\end{tabular}
-			\caption{Belegung der Hard- sowie Softwaretimer}
-			\label{tab:belegungTimer}
-		\end{table}
-		\newpage
-	\subsubsection{Regler}
-		\begin{figure}[h]
+
+
+	\subsection{Regler}
+		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=\textwidth]{rec/Regler.pdf}
 			\caption{Kaskadenreglung Bahngeschwindigkeit}
@@ -269,7 +276,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		Die gerade beschriebene Regelstrategie ist als solche nur im Automatik-Modus aktiv.\\
 		Im manuellen Modus wird die Sollspannung direkt durch den Handregler vorgegeben.
 		\newpage
-	\subsubsection{Analog Digital Wandler}
+	\subsection{Analog Digital Wandler}
 
 		Der Mikrocontroller des Arduinos (Atmel Atmega 2560) hat bereits einen 10 bit ADC (Analog Digital Converter) auf dem Chip integriert, dass auf einen externen Wandler verzichtet werden kann.
 		Da der Wandler immer nur einen Messung durchführen kann, hat der Hersteller ein (MUX) Multiplexer integriert um zwischen den einzelnen ADC Pins des Mikrocontroller durchzuschalten.
@@ -281,9 +288,9 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		Die Steuerung des Multiplexers erfolgt über ein Zustandsautomat der immer dann getriggert wird, wenn wenn die letzte Messung des ADC abgeschlossen ist.
 
 
-		\newpage
-\section{Bedienungsanleitung}
-	\begin{figure}[h]
+
+\chapter{Bedienungsanleitung}
+	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.png}
 		\caption{Zustandsautomat Betriebsmodi}
@@ -296,20 +303,20 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 	\end{itemize}
 	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell gegen ein Automatisiertes Fahrzeug antreten kann. Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung der Bahn mit dem Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
 	Der Wechsel zwischen den Modi findet nach Abbildung \ref{img:Betriebsmodi} statt und ist in den jeweiligen Abschnitten genauer erklärt.
-	\subsection{Manuelles Fahren}
+	\section{Manuelles Fahren}
 		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die orginalen Carrera Handregler gesteuert
 		werden.
-	\subsection{Automatisiertes Fahren}
+	\section{Automatisiertes Fahren}
 		Der Automatisierte Modus ist aufgeschlüsselt in 2 Zustände:
 		\begin{itemize}
 			\item Auto-wait
 			\item Auto-run
 		\end{itemize}
-		\subsubsection{Auto-Wait}
+		\subsection{Auto-Wait}
 		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in
 		Auto-wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers wechselt das Auto in den Auto-run Zustand.
-		\subsubsection{Auto-Run}
+		\subsection{Auto-Run}
 			Im Auto-run Zustand fährt das Auto selbständig. Die Strecke ist in 3 Abschnitte unterteilt.
 			\begin{itemize}
 				\item{1.} Startlinie $\rightarrow$ Vor dem Looping
@@ -319,20 +326,19 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
 			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping, sowie nach dem Looping bis zur Startlinie in Streckenabschnitt 1 zusammegefasst.
 			Die der Weg in dem Looping bildet dort Streckenabschnitt 2.
-			\newpage
 
-\newpage
 
-\section{Zusammenfassung}
-\newpage
 
-\section{Quellenverzeichnis}
-\newpage
 
-\section{Anhang}
-\subsection{Pinbelegung}
-\subsubsection{Sub-D}
-\begin{table}[h]
+\chapter{Zusammenfassung}
+
+
+
+
+\chapter{Anhang}
+\section{Pinbelegung}
+
+\begin{table}
 		\begin{tabular}{|l|l|}
 			\hline
 			\textbf{Sub-D Pin} &\textbf{Funktion}\\
@@ -372,8 +378,8 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		\caption{Pinbelegung der Sub-D Buchse auf dem HID}
 		\label{tab:AnhangBelegungSUBD}
 	\end{table}
-	\subsubsection{Raspberry Pi}
-	\begin{table}[h]
+
+	\begin{table}
 		\begin{tabular}{|l|l|}
 			\hline
 			\textbf{Raspberry Pin} &\textbf{Funktion}\\
@@ -401,7 +407,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		\caption{Pinbelegung GPIO RaspberryPi}
 		\label{tab:AnhangBelegungRPI}
 	\end{table}
-	\subsubsection{Arduino}
+
 	\begin{table}[hb]
 		\begin{tabular}{|l|l|l|}
 			\hline
