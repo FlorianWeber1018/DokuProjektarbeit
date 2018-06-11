@@ -157,13 +157,13 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 				\end{itemize}
 				\item Analog Digital Converter
 				\begin{itemize}
-					\item[7.] ADC\underline{ }vect
+					\item[7.] ADC\underline{ }vect  (Abschnitt \ref{subsubsec:ADCINT})
 				\end{itemize}
 
 			\end{itemize}
 			\newpage
 			Zu Anfang des Programms wird die ganze Peripherie initialisiert, und die Variablen mit ihren default Werten geladen.
-			Anschliesend werden die Interrupts global freigegeben. Ab hier ist die Steuerung Funktionsfähig.
+			Anschliesend werden die Interrupts global freigegeben. Ab hier ist die Steuerung funktionsfähig.
 			\subsubsection{Timer}\label{subsubsec:Timer}
 			Für Die Funktion der Steuerung werden viele Timer benötigt.\\
 			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
@@ -256,9 +256,10 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 				\caption{Belegung der Pin Change Interrupts}
 				\label{tab:belegungpcint}
 			\end{table}
+			\subsubsection{Analog Digital Converter Interrupt}\label{subsubsec:ADCINT}
+			Dieser ist genauer in Abschnitt \ref{subsubsec:ADCINT} beschrieben.
 
-
-
+			%erklärung an diesem
 	\subsection{Regler}
 		\begin{figure}[ht]
 			\centering
@@ -287,7 +288,33 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 
 		Die Steuerung des Multiplexers erfolgt über ein Zustandsautomat der immer dann getriggert wird, wenn wenn die letzte Messung des ADC abgeschlossen ist.
 
+		\begin{figure}[ht]
+			\centering
+			\includegraphics[width=0.3\textwidth]{rec/ADCAutomat.png}
+			\caption{Zustandsautomat Analog Digital Converter Kanal}
+			\label{img:ADCMUX}
+		\end{figure}
 
+\subsection{PWM Generierung Tiefsetzsteller}
+\begin{figure}[th]
+	\centering
+	\begin{subfigure}{0.34\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{rec/zustandsautomatPWM.png}
+		\caption{Zustandsautomat PWM Generierung}
+
+	\end{subfigure}
+	\begin{subfigure}{0.64\textwidth}
+		\centering
+		\includegraphics[width=0.95\textwidth]{rec/graphPWM.png}
+		\caption{Ausgang PWM-Pin als Funktion des Zählerstands}
+
+	\end{subfigure}
+	\label{fig:PWMGEN}
+
+\end{figure}
+
+%wie wird pwm generiert
 
 \chapter{Bedienungsanleitung}
 	\begin{figure}[ht]
