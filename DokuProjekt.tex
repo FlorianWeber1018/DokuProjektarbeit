@@ -52,6 +52,15 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	Diese Beschreibung ist immer nur für Bahn-A, da die
 	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
 	\ref{img:carrerakomplett} Bezug genommen.
+	Die Sensoren in den Schienen teilen die Bahn in 3 Streckenabschnitte auf:
+	\begin{itemize}
+		\item{1.} Startlinie $\rightarrow$ Vor dem Looping
+		\item{2.} Vor dem Looping $\rightarrow$ Nach dem Looping
+		\item{3.} Nach dem Looping $\rightarrow$ Startlinie
+	\end{itemize}
+	Auf Abschnitt 1 und Abschnitt 3 wird im automatisierten Modus die mittlere Geschwindigkeit des Autos geregelt.
+	Im Looping (Abschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
+	Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
@@ -69,10 +78,13 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	\section{Sensoren}
 		Pro Schiene gibt es 3 Sensoren die als Gabellichtschranke ausgeführt sind. Sensor 0 befindet sich am Start, Sensor 1 vor dem Looping und 		Sensor 2 Nach dem Looping.\\
 
-		Sensor 0 wird im Wesentlichen nur zur Zeitmessung genutzt, dazu später mehr.
-		Sensor 1 wird genutzt um ein Signal zu generieren, so dass die Steuerung das Auto im Automatik-Modus für den Looping beschleunigen kann. 		Das Signal von Sensor 2 wird schließlich genutzt um nach dem Looping wieder die langsame Geschwindigkeit zu triggern.\\
+
+		Sensor 0 wird im Wesentlichen nur zur Zeitmessung genutzt.
+		Sensor 1 wird genutzt um ein Signal zu generieren, so dass die Steuerung das Auto im Automatik-Modus für den Looping beschleunigen kann.
+		Das Signal von Sensor 2 wird schließlich genutzt um nach dem Looping wieder die langsame Geschwindigkeit zu triggern.\\
+
 		Im manuellen Modus dienen die Sensoren nur zur Zeitmessung für die Visualisierung.
-		Da die Flanke nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen wurden die Hardware 		Pin Change Interrupts des Atmega2560 genutzt.
+		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen wurden die Hardware	Pin Change Interrupts des Atmega2560 genutzt.
 	\section{Bedienschnittstelle}
 		\begin{figure}[ht]
 			\centering
@@ -209,7 +221,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 					\label{tab:belegungTimer}
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
-			Wenn ein Auto nun auf, Beispielsweise Sensor 0(Bahn A, am Start), fährt wird der Pegel kurze Zeit \emph{low} und nach verlassen des Sensors wieder \emph{high}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
+			Wenn ein Auto nun auf, Beispielsweise Sensor 0 (Bahn A, am Start), fährt wird der Pegel kurze Zeit \emph{low} und nach verlassen des Sensors wieder \emph{high}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
 			Außerdem gibt es die zwei Möglichkeiten:
 				\begin{itemize}
 					\item war es ein High $\rightarrow$ Low Übergang
@@ -257,7 +269,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 				\label{tab:belegungpcint}
 			\end{table}
 			\subsubsection{Analog Digital Converter Interrupt}\label{subsubsec:ADCINT}
-			Dieser ist genauer in Abschnitt \ref{subsubsec:ADCINT} beschrieben.
+			zum Betrieb des Zustandsautomats welcher den Multiplexer des ADC steuert ist ein Interrupt notwendig, welches ausgelöst wird, wenn der ADC eine MEssung abgeschlossen hat. Dieser Automat is genauer in Abschnitt \ref{subsec:ADC} beschrieben.
 
 			%erklärung an diesem
 	\subsection{Regler}
@@ -267,7 +279,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 			\caption{Kaskadenreglung Bahngeschwindigkeit}
 			\label{img:Regelung}
 		\end{figure}
-		Die Regelung für die Bahngeschwindigkeit ist als Kaskadenregelung (Abbildung \ref{img:Regelung})ausgeführt.
+		Die Regelung für die Bahngeschwindigkeit ist als Kaskadenregelung (Abbildung \ref{img:Regelung}) ausgeführt.
 		Dem Führungsregler wird eine Sollzeit für Streckenabschnitt 3 vorgegeben, dieser gibt nun die Sollspannung für den Folgeregler vor.
 		Der Folgeregler hat als Stellgröße den Duty-Cycle des zugehörigen Tiefsetzstellers und regelt die Spannung auf der Schiene auf den gegebenen Wert.
 		Der Regelalgorithmus des Spannungsreglers wird in festen Zeitabständen, vorgegeben durch OCR3 (Overflow Compare Register Timer3), zyklisch aufgerufen.
@@ -277,7 +289,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		Die gerade beschriebene Regelstrategie ist als solche nur im Automatik-Modus aktiv.\\
 		Im manuellen Modus wird die Sollspannung direkt durch den Handregler vorgegeben.
 		\newpage
-	\subsection{Analog Digital Wandler}
+	\subsection{Analog Digital Wandler}\label{subsec:ADC}
 
 		Der Mikrocontroller des Arduinos (Atmel Atmega 2560) hat bereits einen 10 bit ADC (Analog Digital Converter) auf dem Chip integriert, dass auf einen externen Wandler verzichtet werden kann.
 		Da der Wandler immer nur einen Messung durchführen kann, hat der Hersteller ein (MUX) Multiplexer integriert um zwischen den einzelnen ADC Pins des Mikrocontroller durchzuschalten.
@@ -317,6 +329,9 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 %wie wird pwm generiert
 
 \chapter{Bedienungsanleitung}
+\section{Einschalten}
+	Die Anlage muss zum einschalten lediglich mit der Netzversorgung verbunden werden. Sobald Die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist Die Carrerabahn betriebsbereit und im Modus Manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
+\section{Betrieb}
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.png}
@@ -328,38 +343,34 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		\item Manuelles Fahren
 		\item Automatisiertes Fahren
 	\end{itemize}
-	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell gegen ein Automatisiertes Fahrzeug antreten kann. Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung der Bahn mit dem Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
+	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass man zum Beispiel manuell gegen ein automatisiertes Fahrzeug antreten kann. Die Wahl eines dementsprechenden Modus wird durch eine Led über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung jeder Bahn mit dem entsprechenden Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
 	Der Wechsel zwischen den Modi findet nach Abbildung \ref{img:Betriebsmodi} statt und ist in den jeweiligen Abschnitten genauer erklärt.
-	\section{Manuelles Fahren}
+	\subsection{Manuelles Fahren}\label{subsec:ManuellesFahren}
 		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die orginalen Carrera Handregler gesteuert
 		werden.
-	\section{Automatisiertes Fahren}
+	\subsection{Automatisiertes Fahren}
 		Der Automatisierte Modus ist aufgeschlüsselt in 2 Zustände:
 		\begin{itemize}
 			\item Auto-wait
 			\item Auto-run
 		\end{itemize}
-		\subsection{Auto-Wait}
+		\subsubsection{Auto-Wait}
 		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in
 		Auto-wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers wechselt das Auto in den Auto-run Zustand.
-		\subsection{Auto-Run}
-			Im Auto-run Zustand fährt das Auto selbständig. Die Strecke ist in 3 Abschnitte unterteilt.
-			\begin{itemize}
-				\item{1.} Startlinie $\rightarrow$ Vor dem Looping
-				\item{2.} Vor dem Looping $\rightarrow$ Nach dem Looping
-				\item{3.} Nach dem Looping $\rightarrow$ Startlinie
-			\end{itemize}
-			Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
-			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping, sowie nach dem Looping bis zur Startlinie in Streckenabschnitt 1 zusammegefasst.
-			Die der Weg in dem Looping bildet dort Streckenabschnitt 2.
+		\subsubsection{Auto-Run}
+			Im Auto-run Zustand fährt das Auto selbständig. Durch die Regelung der mittleren Geschwindigkeit des langsamen Streckenabschnitts braucht das Auto einige Runden um die optimale Spannung für diese Geschwindigkeit zu finden.
 
-
-
-
+			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping in Streckenabschnitt 1 zusammengefasst.
+			Der Rest einer Runde (vor dem Looping bis zur Startlinie) bildet Streckenabschnitt 2.
+\section{Ausschalten}
+Um die Anlage ordnungsgemäß herunterzufahren, muss man den Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens 5 Sekunden gedrückt halten.
+Nun muss man warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen dass die grüne Led auf dem RaspberryPi nichtmehr blinkt und der Bildschirm in den Standby-Modus schaltet.
 \chapter{Zusammenfassung}
 
-
+%verbesserung:
+	%pi auch Solarstrom
+	%Looping bürsten kontakt
 
 
 \chapter{Anhang}
