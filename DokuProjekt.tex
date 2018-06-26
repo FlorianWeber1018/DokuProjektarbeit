@@ -308,23 +308,27 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 		\end{figure}
 
 \subsection{PWM Generierung Tiefsetzsteller}
-\begin{figure}[th]
+\begin{figure}[htp]
 	\centering
 	\begin{subfigure}{0.34\textwidth}
 		\centering
 		\includegraphics[width=0.95\textwidth]{rec/zustandsautomatPWM.png}
 		\caption{Zustandsautomat PWM Generierung}
-
+		\label{fig:PWMGENAut}
 	\end{subfigure}
 	\begin{subfigure}{0.64\textwidth}
 		\centering
 		\includegraphics[width=0.95\textwidth]{rec/graphPWM.png}
 		\caption{Ausgang PWM-Pin als Funktion des Zählerstands}
-
+		\label{fig:PWMGENFX}
 	\end{subfigure}
-	\label{fig:PWMGEN}
+
 
 \end{figure}
+
+Wie aus Abbildung \ref{fig:PWMGENFX} hervorgeht, ist das PWM Signal direkt eine Funktion des aktuellen Zählerstands von Timer0, sowie dem Inhalt des jeweiligen Overflow Compare Registers OCR0A/B.
+Die PWM Generierung ist durch den Mikrocontroller in Hardware implementiert und muss lediglich aktiviert werden. Die Konfiguration dieser PWM Generierung ist in der Funktion initTimer implementiert und wird einmal zu Programmstart aufgerufen. Der Hardwaretimer setzt nun den jeweiligen Pin beim Überlauf des 8-bit Timers (Wert 0) auf High-Pegel und beim Erreichen des Wertes im OCR0AB Registers ( zum Beispiel  bei DutyCycle = 50\% OCR0A = 127 ) auf Low-Pegel.
+Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildung  \ref{fig:PWMGENAut} als Zustandsautomat dargestellt.
 
 %wie wird pwm generiert
 
@@ -367,10 +371,12 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 Um die Anlage ordnungsgemäß herunterzufahren, muss man den Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens 5 Sekunden gedrückt halten.
 Nun muss man warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen dass die grüne Led auf dem RaspberryPi nichtmehr blinkt und der Bildschirm in den Standby-Modus schaltet.
 \chapter{Zusammenfassung}
-
-%verbesserung:
-	%pi auch Solarstrom
-	%Looping bürsten kontakt
+Die Zu Beginn definierten Ziele der Projektarbeit wurden durch das neue Steuer-/Regelkonzept sowie eine neue Hardware Architektur fast alle erreicht. Lediglich die Robustheit der Anlage ist ist nicht vollsändig gegeben, da gelegentlich ein Auto im Looping herunterfällt.
+Durch längere Tests und Analyse der Fehlerbilder hat sich herausgestellt, dass dies kein Problem der Automatisierung und Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrerabahn.
+Man hat herausgefunden dass im Looping die Stromschiene auf der Bahn ein wenig in der Oberfläche versenkt ist und der Übergang zwischen den zusammengesteckten Streckenstücken einen unstetigen Verlauf hat. Dadurch ergibt sich eine Diskontinuität des Stroms durch den Antrieb des Fahrzeugs im Looping was zu Geschwindigkeitsverlust, sowie letztendlich zum Absturz des Fahrzeugs führt. Biegt man nun die Strombürsten des Fahrzeugs weiter in Richtung Schiene um die schlechte Mechanische Beschaffenheit auszugleichen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nichtmehr verlässlich.
+Ein weitere Randbedingung für die Realisierung war dass die Automatisierung unabhängig von der länge der Strecke funktionieren sollte.
+Aufgrund dieser forderung musste die Funktionalität das Auto auf der Geraden zu beschleunigen verworfen werden, da dies nun nichtmehr in Abhängigkeit einer konstante Zeit realisiert werden kann. Als weiterführende Verbesserung könnte man zusätzliche Sensoren vor der Kurve zum abremsen einbauen.
+Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des RaspberryPi, sowie des Arduino auch autark über die Solarpanels zu ermöglichen.
 
 
 \chapter{Anhang}
