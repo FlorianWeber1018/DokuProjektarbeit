@@ -99,7 +99,6 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Mit Taster 2 lässt sich der Regler der Bahngeschwindigkeit, genauer Sollspannung außerhalb des Loopings, auf seinen Startwert zurücksetzen.
 		Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen.
 	\section{Arduino}
-	%HIER WEITER
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
 		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, welche bereits die wichtigsten Beschaltungen des Mikrokontrollers enthält wie zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
@@ -134,8 +133,8 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		per ISP beschrieben. Der Bootloader des Arduino wurde dazu entfernt.
 		Gründe dazu waren unter anderem die Wahl der Sprache C++,
 		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen (Timer, Hardwareinterrupts...).
-		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern. Zu Anfang des Programms wird die ganze Peripherie initialisiert, und die Variablen mit ihren default Werten geladen.
-		Anschliesend werden die Interrupts global freigegeben. Ab hier ist die Steuerung funktionsfähig.\\
+		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern. Zu Beginn des Programms wird die ganze Peripherie konfiguriert und die globalen Variablen mit ihren default Werten geladen.
+		Anschließend werden die Interrupts global freigegeben. Ab hier ist die Steuerung funktionsfähig.\\
 		\subsection{Interrupts}
 		\begin{figure}[ht]
 			\centering
@@ -177,11 +176,11 @@ Der Programmablauf ist größtenteils interruptgesteuert.
 				\end{itemize}
 
 			\end{itemize}
-
+%HIER WEITER
 			\subsubsection{Timer}\label{subsubsec:Timer}
 			Für Die Funktion der Steuerung werden viele Timer benötigt.\\
 			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
-			Dieser erhält sein Takt von einem Hardwaretimer.
+			Dieser bezieht sein Takt von einem Hardwaretimer.
 			Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
 				\begin{table}[ht]
 					\begin{tabular}{|l|l|l|}
@@ -216,22 +215,23 @@ Der Programmablauf ist größtenteils interruptgesteuert.
 						\hline
 						15..16 & Ohne Verwendung\\
 						\hline
-						17 & Trigger für Zeitmessung Resettaster\\
+						17 & Trigger für Zeitmessung Resettaster Visualisierung (langer Tastendruck)\\
 						\hline
 					\end{tabular}
 					\caption{Belegung der Hard- sowie Softwaretimer}
 					\label{tab:belegungTimer}
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
-			Wenn ein Auto nun auf, Beispielsweise Sensor 0 (Bahn A, am Start), fährt wird der Pegel kurze Zeit \emph{low} und nach verlassen des Sensors wieder \emph{high}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
+			Wenn ein Auto auf, Beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
+			Dies wurde realisiert, imdem man sich den Zustand des letzten Pin Change Interrupt gemerkt hat und diesen mit dem aktuellen Zustand, des jeweiligen Ports, durch ein Exklusivoder verknüpft.
 			Außerdem gibt es die zwei Möglichkeiten:
 				\begin{itemize}
 					\item war es ein High $\rightarrow$ Low Übergang
 					\item war es ein Low $\rightarrow$ High Übergang
 				\end{itemize}
-
-			Zum Entprellen des Eingangs wird direkt, nachdem das Event gehandelt wurde, der Eingang deaktiviert. Danach wird ein Software-Timer gestartet der den Eingang nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass wenn das Auto beim Überahren des Sensors das dementsprechende Event nur einmal triggert.
-			Analog zu diesem Sensor 0, ist dies für jeden Sensor sowie Taster realisiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
+			Hat ein \emph{High-Low} Übergang stattgefunden, wird ein Event erzeugt.
+			Zum Entprellen des Eingangs wird direkt, nachdem das Event gehandelt wurde, der Eingang deaktiviert. Danach wird ein Software-Timer gestartet der den Eingang nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Überahren des Sensors, das dementsprechende Event nur einmal triggert.
+			Analog zu dem Sensor 0, ist dies für jeden Sensor sowie Taster implementiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
 			\begin{table}[ht]
 				\begin{tabular}{|l|l|l|}
 					\hline
@@ -271,7 +271,7 @@ Der Programmablauf ist größtenteils interruptgesteuert.
 				\label{tab:belegungpcint}
 			\end{table}
 			\subsubsection{Analog Digital Converter Interrupt}\label{subsubsec:ADCINT}
-			zum Betrieb des Zustandsautomats welcher den Multiplexer des ADC steuert ist ein Interrupt notwendig, welches ausgelöst wird, wenn der ADC eine MEssung abgeschlossen hat. Dieser Automat is genauer in Abschnitt \ref{subsec:ADC} beschrieben.
+			Zum Betrieb des Zustandsautomats (Abbildung \ref{img:ADCMUX}) welcher den Multiplexer des ADC steuert ist ein Interrupt notwendig, welches ausgelöst wird, wenn der ADC eine Messung abgeschlossen hat. Dieser Automat ist genauer in Abschnitt \ref{subsec:ADC} beschrieben.
 
 			%erklärung an diesem
 	\subsection{Regler}
@@ -282,25 +282,30 @@ Der Programmablauf ist größtenteils interruptgesteuert.
 			\label{img:Regelung}
 		\end{figure}
 		Die Regelung für die Bahngeschwindigkeit ist als Kaskadenregelung (Abbildung \ref{img:Regelung}) ausgeführt.
-		Dem Führungsregler wird eine Sollzeit für Streckenabschnitt 3 vorgegeben, dieser gibt nun die Sollspannung für den Folgeregler vor.
+		Dem Führungsregler wird eine konstante Sollzeit für Streckenabschnitt 3 vorgegeben. Dieser gibt nun, im Automatikmodus, die Sollspannung für den Folgeregler vor.
+		Im manuellen Modus entspricht die Sollspannung einer skalierten Größe des jeweiligen Handreglers.
 		Der Folgeregler hat als Stellgröße den Duty-Cycle des zugehörigen Tiefsetzstellers und regelt die Spannung auf der Schiene auf den gegebenen Wert.
 		Der Regelalgorithmus des Spannungsreglers wird in festen Zeitabständen, vorgegeben durch OCR3 (Overflow Compare Register Timer3), zyklisch aufgerufen.
 		Der Regelalgorithmus des Reglers der Bahngeschwindigkeit wird immer dann aufgerufen, wenn ein neuer Zeitwert für den Streckenabschnitt 3 vorliegt.
-		Dieses Vorgehen ist sehr störanfällig, allerdings ist es die einzige Möglichkeit, einen solche Regelung mit den vorhandenen Sensoren zu realisieren. \\
-		Der Vorfaktor des Führungsreglers ist eher verhältnismäßig klein gewählt, um ein Überschwingen möglichst zu verhindern.
+		Dieses Vorgehen ist durch die geringe Abtastrate des Führungsregles sehr störanfällig (Zum Beispiel wenn man das Auto in Streckenabschnitt 3 festgehalten wird), allerdings ist es die einzige Möglichkeit, einen solche Regelung mit den vorhandenen Sensoren zu realisieren. Die Bedingung für eine Kaskadenregelung (inner Regelkreis mindestens 10mal schneller als der Äußere) ist sicher eingehalten.\\
+		Der Vorfaktor des Führungsreglers ist eher verhältnismäßig klein gewählt, um ein Überschwingen möglichst zu Verhindern, da dies bedeuten würde, dass das Auto die Strecke verlässt.
 		Die gerade beschriebene Regelstrategie ist als solche nur im Automatik-Modus aktiv.\\
 		Im manuellen Modus wird die Sollspannung direkt durch den Handregler vorgegeben.
 		\newpage
 	\subsection{Analog Digital Wandler}\label{subsec:ADC}
 
-		Der Mikrocontroller des Arduinos (Atmel Atmega 2560) hat bereits einen 10 bit ADC (Analog Digital Converter) auf dem Chip integriert, dass auf einen externen Wandler verzichtet werden kann.
-		Da der Wandler immer nur einen Messung durchführen kann, hat der Hersteller ein (MUX) Multiplexer integriert um zwischen den einzelnen ADC Pins des Mikrocontroller durchzuschalten.
+		Der Mikrocontroller des Arduinos (Atmel Atmega 2560) hat bereits einen 10 bit ADC (Analog Digital Converter) auf dem Chip integriert, sodass auf einen externen Wandler, verzichtet werden kann.
+		Da der Wandler immer nur eine Messung durchführen kann, hat der Hersteller ein (MUX) Multiplexer integriert, um zwischen den einzelnen ADC Pins des Mikrocontroller durchzuschalten.
 		Die Belegung der ADC Pins des Mikrocontrollers ist in Tabelle \ref{tab:AnhangBelegungArduino} enthalten.
 
 		Wenn die angestoßene Messung des ADC abgeschlossen ist, wird ein Interrupt ausgelöst.
 
 
-		Die Steuerung des Multiplexers erfolgt über ein Zustandsautomat der immer dann getriggert wird, wenn wenn die letzte Messung des ADC abgeschlossen ist.
+		Die Steuerung des Multiplexers erfolgt über ein Zustandsautomat (Abbildung \ref{img:ADCMUX}), der immer dann ein Schritt weiter springt, wenn die letzte Messung des ADC abgeschlossen ist. In jedem Schritt des Automats, wird schematisch das Selbe durchgeführt:
+		\begin{itemize}
+		\item	Letzter gemessener Wert in Variable speichern
+		\item Nächste Messung vorbereiten (Multiplexer steuern und Messung anstoßen)
+		\end{itemize}
 
 		\begin{figure}[ht]
 			\centering
@@ -336,7 +341,7 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 
 \chapter{Bedienungsanleitung}
 \section{Einschalten}
-	Die Anlage muss zum einschalten lediglich mit der Netzversorgung verbunden werden. Sobald Die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist Die Carrerabahn betriebsbereit und im Modus Manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
+	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald Die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist Die Carrerabahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
 \section{Betrieb}
 	\begin{figure}[ht]
 		\centering
@@ -357,27 +362,27 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 	\subsection{Automatisiertes Fahren}
 		Der Automatisierte Modus ist aufgeschlüsselt in 2 Zustände:
 		\begin{itemize}
-			\item Auto-wait
-			\item Auto-run
+			\item Auto-Wait
+			\item Auto-Run
 		\end{itemize}
 		\subsubsection{Auto-Wait}
 		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in
-		Auto-wait und das Auto steht.
-		Durch kurzes durchdrücken des zugehörigen Handreglers wechselt das Auto in den Auto-run Zustand.
+		Auto-Wait und das Auto steht.
+		Durch kurzes durchdrücken des zugehörigen Handreglers, wechselt das Auto in den Auto-Run Zustand.
 		\subsubsection{Auto-Run}
-			Im Auto-run Zustand fährt das Auto selbständig. Durch die Regelung der mittleren Geschwindigkeit des langsamen Streckenabschnitts braucht das Auto einige Runden um die optimale Spannung für diese Geschwindigkeit zu finden.
+			Im Auto-run Zustand fährt das Auto selbständig. Durch die Regelung der mittleren Geschwindigkeit des langsamen Streckenabschnitts, braucht das Auto einige Runden um die optimale Spannung, für diese Geschwindigkeit zu finden.
 
 			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping in Streckenabschnitt 1 zusammengefasst.
 			Der Rest einer Runde (vor dem Looping bis zur Startlinie) bildet Streckenabschnitt 2.
 \section{Ausschalten}
-Um die Anlage ordnungsgemäß herunterzufahren, muss man den Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens 5 Sekunden gedrückt halten.
-Nun muss man warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen dass die grüne Led auf dem RaspberryPi nichtmehr blinkt und der Bildschirm in den Standby-Modus schaltet.
+Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens 5 Sekunden gedrückt zu halten.
+Nun muss man warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne Led auf dem RaspberryPi nichtmehr blinkt und der Bildschirm in den Standby-Modus schaltet.
 \chapter{Zusammenfassung}
-Die Zu Beginn definierten Ziele der Projektarbeit wurden durch das neue Steuer-/Regelkonzept sowie eine neue Hardware Architektur fast alle erreicht. Lediglich die Robustheit der Anlage ist ist nicht vollsändig gegeben, da gelegentlich ein Auto im Looping herunterfällt.
-Durch längere Tests und Analyse der Fehlerbilder hat sich herausgestellt, dass dies kein Problem der Automatisierung und Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrerabahn.
-Man hat herausgefunden dass im Looping die Stromschiene auf der Bahn ein wenig in der Oberfläche versenkt ist und der Übergang zwischen den zusammengesteckten Streckenstücken einen unstetigen Verlauf hat. Dadurch ergibt sich eine Diskontinuität des Stroms durch den Antrieb des Fahrzeugs im Looping was zu Geschwindigkeitsverlust, sowie letztendlich zum Absturz des Fahrzeugs führt. Biegt man nun die Strombürsten des Fahrzeugs weiter in Richtung Schiene um die schlechte Mechanische Beschaffenheit auszugleichen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nichtmehr verlässlich.
+Die Zu Beginn definierten Ziele der Projektarbeit wurden durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle erreicht. Lediglich die Robustheit der Anlage ist ist nicht vollsändig gegeben, da gelegentlich ein Auto im Looping herunterfällt.
+Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Automatisierung und Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrerabahn.
+Man hat herausgefunden dass im Looping die Stromschiene auf der Bahn, ein wenig in der Oberfläche versenkt ist und der Übergang zwischen den zusammengesteckten Streckenstücken einen unstetigen Verlauf hat. Dadurch ergibt sich eine Diskontinuität des Stroms durch den Antrieb des Fahrzeugs im Looping, was zu Geschwindigkeitsverlust, sowie letztendlich zum Absturz des Fahrzeugs führt. Biegt man nun die Strombürsten des Fahrzeugs weiter in Richtung Schiene um die schlechte Mechanische Beschaffenheit auszugleichen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nichtmehr verlässlich.
 Ein weitere Randbedingung für die Realisierung war dass die Automatisierung unabhängig von der länge der Strecke funktionieren sollte.
-Aufgrund dieser forderung musste die Funktionalität das Auto auf der Geraden zu beschleunigen verworfen werden, da dies nun nichtmehr in Abhängigkeit einer konstante Zeit realisiert werden kann. Als weiterführende Verbesserung könnte man zusätzliche Sensoren vor der Kurve zum abremsen einbauen.
+Aufgrund dieser Forderung musste die Funktionalität, das Auto auf der Geraden zu beschleunigen verworfen werden, da dies nun nichtmehr in Abhängigkeit einer konstante Zeit realisiert werden kann. Als weiterführende Verbesserung könnte man zusätzliche Sensoren vor der Kurve zum abremsen einbauen.
 Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des RaspberryPi, sowie des Arduino auch autark über die Solarpanels zu ermöglichen.
 
 
