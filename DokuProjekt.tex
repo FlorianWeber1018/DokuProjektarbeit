@@ -30,18 +30,17 @@
 \newpage
 
 \chapter{Vorwort}
-Zu Beginn des Projekts war die Carrera Bahn auf dem Stand, dass die Fahrzeuge konventionell sowie automatisiert gesteuert werden konnten. Außerdem war die Rundenzeitmessung und Visualisierung bereits realisiert. Bei der Energieversorgung konnte zwischen Solarstrom und Netzversorgung gewählt werden.
+Zu Beginn des Projekts war die Carrera Bahn auf dem Stand, dass die Fahrzeuge konventionell sowie automatisiert betrieben werden konnten. Außerdem war die Rundenzeitmessung und Visualisierung bereits realisiert. Bei der Energieversorgung konnte zwischen Solarstrom und Netzversorgung gewählt werden.
 Die Solarstromversorgung wurde pro Bahn durch 2 Solarpanels und einem Tiefsetzsteller mit konstantem Dutycycle hergestellt, die Netzstromversorgung mit einem 15V Schaltnetzteil.
 
-Die Manuelle Steuerung durch den Nutzer wurde realisiert, indem man die klassischen Carrera Drücker, als Variablen Vorwiderstand eingesetzt hat. Im automatisierten Modus musste ein Potentiometer bedient, um die langsame Geschwindigkeit des Autos einzustellen.
-In den schnellen Abschnitten der Strecke wurde dieses Poti  durch ein Relais gebrückt und die volle Versorgungsspannung lag an dem Auto an.
+Die manuelle Steuerung der Fahrzeuge durch den Nutzer wurde realisiert, indem die klassischen Carrera Handregler, als Variablen Vorwiderstand zu den Fahrzeugen eingesetzt wurden. Im automatisierten Modus konnte man mit einem Vorwiederstand die Geschwindigkeit der langsamen Streckenabschnitte einstellen. In den schnellen Steckenabschnitten wurde mit einem Relais dieser Widerstand gebrückt und es lag die volle Betriebsspannung der jeweiligen Energieversorgung an dem Auto an.
 \section{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}
 Der im Vorwort grob erwähnte Aufbau der vorhandenen Anlage wies einige Probleme auf:
 \begin{itemize}
-	\item 1. Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt.(Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung allerdings nicht)
-	\item 2. Drift der durch den Poti erzeugten Spannung im automatisierten Modus (Temperaturdrift)
+	\item 1. Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt.(Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung nicht)
+	\item 2. Drift des Widerstandswerts des Potentiometer um den Arbeitspunkt im automatisierten Modus einzustellen (Temperaturdrift).
 	\item 3. Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
-	\item Manchmal wird durch einen Aliasingeffekt das Überschreiten eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten.
+	\item Manchmal wird durch einen Aliasingeffekt das Überfahren eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten. (Echtzeitfähigkeit des Betriebssystems Raspian nicht gegeben)
 \end{itemize}
 Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst werden.
 \newpage
@@ -52,6 +51,7 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	Diese Beschreibung ist immer nur für Bahn-A, da die
 	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
 	\ref{img:carrerakomplett} Bezug genommen.
+
 	Die Sensoren in den Schienen teilen die Bahn in 3 Streckenabschnitte auf:
 	\begin{itemize}
 		\item{1.} Startlinie $\rightarrow$ Vor dem Looping
@@ -69,17 +69,17 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	\end{figure}
 	\begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.85\textwidth]{rec/Carrerabahnroh.png}
+	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
 	\caption{Überblick über die Carrera-Bahn}
 	\label{img:carrerakomplett}
 	\end{figure}
 	\newpage
 
 	\section{Sensoren}
-		Pro Schiene gibt es 3 Sensoren die als Gabellichtschranke ausgeführt sind. Sensor 0 befindet sich am Start, Sensor 1 vor dem Looping und 		Sensor 2 Nach dem Looping.\\
+			Wie man in Abbildung \ref{img:carrerakomplett} sehen kann, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranke ausgeführt. Sensor 0 befindet sich am Start, Sensor 1 vor dem Looping und 		Sensor 2 Nach dem Looping.\\
 
 
-		Sensor 0 wird im Wesentlichen nur zur Zeitmessung genutzt.
+		Sensor 0 wird im Wesentlichen zur Zeitmessung genutzt.
 		Sensor 1 wird genutzt um ein Signal zu generieren, so dass die Steuerung das Auto im Automatik-Modus für den Looping beschleunigen kann.
 		Das Signal von Sensor 2 wird schließlich genutzt um nach dem Looping wieder die langsame Geschwindigkeit zu triggern.\\
 
@@ -88,20 +88,23 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	\section{Bedienschnittstelle}
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=0.85\textwidth]{rec/hid.png}
+			\includegraphics[width=0.95\textwidth]{rec/hid.png}
 			\caption{Bedienschnittstelle}
 			\label{img:hid}
 		\end{figure}
-		Das HID besteht aus 3 Tastern und einem Wechselschalter mit Mittelstellung je Bahn.
-		Der Wechselschalter ist zum Auswählen, ob die Bahn mit Energie aus den Solarpanels betrieben wird, oder mit Netzstrom. Ist Dieser in Mittelstellung, wird die Bahn nicht versorgt und das Auto steht - unabhängig des gewählten Modus.
-		Über Taster 0 beziehungsweise Taster 1 lässt sich der Modus der Bahn auswählen, welcher durch die LEDs bei den Tastern signalisiert wird. \\Hier steht Automatik und Manuell zur Auswahl.
-		Mit Taster 2 lässt sich der Regler der Bahngeschwindigkeit genauer -  Spannung außerhalb des Loopings, auf seinen Startwert zurücksetzen.
+		Wie in Abbildung \ref{img:hid} dargestellt, besteht das HID (Human Interface Device) aus 3 Tastern und einem Wechselschalter mit Mittelstellung je Bahn.
+
+		Der Wechselschalter ist zum Auswählen der Energieversorgung der jeweiligen Bahn. Hierbei stehen die 2 Versorgungsmöglichkeiten Solar oder Netz zur Auswahl. Ist dieser Wechselschalter in Mittelstellung, wird die Bahn nicht versorgt und das Auto steht unabhängig des gewählten Modus.
+		Über Taster 0 beziehungsweise Taster 1 lässt sich der Modus der Bahn auswählen. Taster 0 steht für den manuellen Modus Von Bahn A, Taster 1 für den automatisierten. Der aktuell ausgewählte Modus wird durch die LEDs über bzw unter den Tastern signalisiert.
+		Mit Taster 2 lässt sich der Regler der Bahngeschwindigkeit, genauer Sollspannung außerhalb des Loopings, auf seinen Startwert zurücksetzen.
+		Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen.
 	\section{Arduino}
+	%HIER WEITER
 		Beim Arduino handelt es sich um einen einfachen Arduino Mega 2560 ADK.\\
-		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, die bereits die wichtigsten Beschaltungen des Mikrocontroller enthält wie zum beispiel die Abblockcondensatoren an der Versorgungsspannung aber auch einen USB-Seriell Wandler den man nutzen kann um sich Daten parallel zum Prozess an ein Terminal auszugeben.
+		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, die bereits die wichtigsten Beschaltungen des Mikrocontroller enthält wie zum beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
 	\section{RaspberryPi}
-		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per Uart die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung.
+		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung.
 		Die Visualisierung war zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\section{Tiefsetzsteller}
 		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Bahnen.
