@@ -100,19 +100,19 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen.
 	\section{Arduino}
 	%HIER WEITER
-		Beim Arduino handelt es sich um einen einfachen Arduino Mega 2560 ADK.\\
-		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, die bereits die wichtigsten Beschaltungen des Mikrocontroller enthält wie zum beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
+		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
+		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, welche bereits die wichtigsten Beschaltungen des Mikrokontrollers enthält wie zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
 	\section{RaspberryPi}
 		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung.
 		Die Visualisierung war zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\section{Tiefsetzsteller}
-		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Bahnen.
-		Jeder bekommt sein PWM-Signal(Steuergröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine
+		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Schienen (innerer Regelkreis der Kaskadenregelung).
+		Jeder bekommt sein PWM-Signal (Stellgröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine
 		Strommessung realisiert. Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
 		verarbeitet und ist lediglich für weiterführende Projekte gedacht. Da die Ausgangsspannung des
 		Tiefsetzstellers größer sein kann wie die Referenzspannung des ADC,
-		wird diese über einen Spannungsteiler angepasst und auf einen Kanal des ADC geführt.
+		wird diese über einen Spannungsteiler angepasst und auf einen Kanal des Analog digitalwandlers des Mikrocontrollers geführt.
 		Diese Spannung stellt die Regelgröße dar.
 	\newpage
 
@@ -121,20 +121,21 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 
 		Bei der Software die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
 		Dieses war zu Beginn der Projektarbeit bereits vorhanden und hat die Sensoren
-		der Bahn parallel eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen
-		und die Bestzeit ermittelt.\\
+		der Bahn parallel mit dem GPIO-Port eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen
+		und die Bestzeit pro Bahn ermittelt.\\
 		Dieses Skript wurde größtenteils übernommen und lediglich in der Richtung abgeändert,
 		dass die Trigger-Signale der Sensoren nun über die Serielle Schnittstelle dem Pi mitgeteilt wurden.
-		Desweiteren wurden diverse Bugs behoben wie zB die zu geringe Framerate der Visualisierung.
-		Als serielle Schnittstelle wurde "ttyAMA0" benutzt.
+		Desweiteren wurden diverse Bugs behoben, wie zum Beispiel die zu geringe Framerate der Visualisierung.
+		Als serielle Schnittstelle wurde ttyAMA0 benutzt.
 		\newpage
 	\section{Arduino}
-		Die Software des Arduinos wurde, wie oben bereits erwähnt, nicht in der Arduino Entwicklungsumgebung
-		geschrieben. Stattdessen habe ich auf die IDE "AtmelStudio 7" zurückgegriffen und den Mikrocontroller
-		per ISP beschrieben. Der Bootloader des Arduino musste dazu entfernt werden.
+		Die Software des Arduinos wurde, nicht in der Arduino Entwicklungsumgebung
+		geschrieben. Stattdessen habe ich auf die IDE AtmelStudio 7  zurückgegriffen und den Mikrocontroller
+		per ISP beschrieben. Der Bootloader des Arduino wurde dazu entfernt.
 		Gründe dazu waren unter anderem die Wahl der Sprache C++,
-		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen(Timer, Hardwareinterrupts...).
-		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern.\\
+		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen (Timer, Hardwareinterrupts...).
+		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern. Zu Anfang des Programms wird die ganze Peripherie initialisiert, und die Variablen mit ihren default Werten geladen.
+		Anschliesend werden die Interrupts global freigegeben. Ab hier ist die Steuerung funktionsfähig.\\
 		\subsection{Interrupts}
 		\begin{figure}[ht]
 			\centering
@@ -154,8 +155,8 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 			\\Quelle:Mikrocontroller.net}
 			\label{Programmablauf}
 		\end{figure}
-Der Programmablauf ist größtenteils Interruptgesteuert.
-			Dies hat den Vorteil, dass das Timing nichtmehr von der Länge der MainLoop abhängt und Dinge wie zum  Beispiel der Regelagorythmus immer in der selben Frequenz ausgeführt werden.
+Der Programmablauf ist größtenteils interruptgesteuert.
+			Dies hat den Vorteil, dass das Timing nichtmehr von der Länge der MainLoop abhängt und Dinge wie zum  Beispiel der Regelalgorithmus immer mit der selben Frequenz aufgerufen werden.
 			Interruptquellen des Programms sind:
 			\begin{itemize}
 				\item Timer  (Abschnitt \ref{subsubsec:Timer})
@@ -176,9 +177,7 @@ Der Programmablauf ist größtenteils Interruptgesteuert.
 				\end{itemize}
 
 			\end{itemize}
-			\newpage
-			Zu Anfang des Programms wird die ganze Peripherie initialisiert, und die Variablen mit ihren default Werten geladen.
-			Anschliesend werden die Interrupts global freigegeben. Ab hier ist die Steuerung funktionsfähig.
+
 			\subsubsection{Timer}\label{subsubsec:Timer}
 			Für Die Funktion der Steuerung werden viele Timer benötigt.\\
 			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
