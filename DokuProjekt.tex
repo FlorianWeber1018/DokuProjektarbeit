@@ -62,19 +62,19 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	Im Looping (Abschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
 	Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
 	\begin{figure}[ht]
-		\centering
-		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
-		\caption{Signalfluss}
-		\label{img:signalfluss}
-	\end{figure}
-	\begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
 	\caption{Überblick über die Carrera-Bahn}
 	\label{img:carrerakomplett}
 	\end{figure}
-	\newpage
-
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
+		\caption{Signalfluss}
+		\label{img:signalfluss}
+	\end{figure}
+	In Abbildung \ref{img:signalfluss} bekommt man einen groben Überblick über den Signalfluss auf der Carrerabahn. Hierbei stellt der Arduino das zentrale Element dar. Man kann in der Abbildung erkennen, dass der Arduino die Sensoren in den Schienen, sowie die Taster des Bediefelds parallel einliest. Die Analogen Größen sind an den Analog-Digital-Wandler des Arduinos angeschlossen. Dies sind die Signal der Potentiometer, sowie der Tifsetzsteller (differenzielle Messungdes Stroms über ein Shunt und Messung der Ausgangsspannung). Der Arduino generiert außerdem die zwei PWM-Signale, die von den Tiefsetzstellern benötigt werden. Um eine Visualisierung zu realisieren ist ein RaspberryPi per UART (Universal Asynchronous Receiver Transmitter) seriell angebunden. Wie die anderen Kommunikationsverbindungen, ist auch diese Verbindung nur unidirektional ausgeführt.
+	Die genaue Implementierung der Schnittstellen ist in den jeweiligen Kapiteln genauer beschrieben.
 	\section{Sensoren}
 			Wie man in Abbildung \ref{img:carrerakomplett} sehen kann, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranke ausgeführt. Sensor 0 befindet sich am Start, Sensor 1 vor dem Looping und 		Sensor 2 Nach dem Looping.\\
 
@@ -84,7 +84,7 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Das Signal von Sensor 2 wird schließlich genutzt um nach dem Looping wieder die langsame Geschwindigkeit zu triggern.\\
 
 		Im manuellen Modus dienen die Sensoren nur zur Zeitmessung für die Visualisierung.
-		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen wurden die Hardware	Pin Change Interrupts des Atmega2560 genutzt.
+		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen hat man die Hardware Pin Change Interrupts des Atmega2560 genutzt.
 	\section{Bedienschnittstelle}
 		\begin{figure}[ht]
 			\centering
@@ -100,18 +100,18 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 		Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen.
 	\section{Arduino}
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
-		Dieser wurde gewählt da es sich um eine preiswerte Platine handelt, welche bereits die wichtigsten Beschaltungen des Mikrokontrollers enthält wie zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
+		Diesen hat man gewählt, da es sich um eine preiswerte Platine handelt, welche bereits die wichtigsten Beschaltungen des Mikrokontrollers enthält.
+		Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
 	\section{RaspberryPi}
-		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung.
+		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung (siehe Abbildung \ref{img:hid}).
 		Die Visualisierung war zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\section{Tiefsetzsteller}
 		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Schienen (innerer Regelkreis der Kaskadenregelung).
-		Jeder bekommt sein PWM-Signal (Stellgröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine
-		Strommessung realisiert. Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
-		verarbeitet und ist lediglich für weiterführende Projekte gedacht. Da die Ausgangsspannung des
-		Tiefsetzstellers größer sein kann wie die Referenzspannung des ADC,
-		wird diese über einen Spannungsteiler angepasst und auf einen Kanal des Analog digitalwandlers des Mikrocontrollers geführt.
+		Jeder bekommt sein PWM-Signal (Stellgröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine Strommessung realisiert.
+		Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
+		verarbeitet und ist lediglich für weiterführende Projekte gedacht.
+		Da die Ausgangsspannung des Tiefsetzstellers (lediglich begrenzt durch die Leerlaufspannung eines PV-Strangs) größer sein kann wie die Referenzspannung des ADC (interne Referenzspannung von 2.56V), wird diese über einen Spannungsteiler angepasst und auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt.
 		Diese Spannung stellt die Regelgröße dar.
 	\newpage
 
@@ -119,22 +119,22 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 	\section{RaspberryPi}
 
 		Bei der Software die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
+
 		Dieses war zu Beginn der Projektarbeit bereits vorhanden und hat die Sensoren
-		der Bahn parallel mit dem GPIO-Port eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen
-		und die Bestzeit pro Bahn ermittelt.\\
-		Dieses Skript wurde größtenteils übernommen und lediglich in der Richtung abgeändert,
-		dass die Trigger-Signale der Sensoren nun über die Serielle Schnittstelle dem Pi mitgeteilt wurden.
-		Desweiteren wurden diverse Bugs behoben, wie zum Beispiel die zu geringe Framerate der Visualisierung.
-		Als serielle Schnittstelle wurde ttyAMA0 benutzt.
+		der Bahn parallel mit dem GPIO-Port eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen und die Bestzeit pro Bahn ermittelt.\\
+		Dieses Skript hat man größtenteils übernommen und lediglich in der Richtung abgeändert, dass die Trigger-Signale der Sensoren nun über die serielle Schnittstelle dem Pi mitgeteilt werden.
+		Desweiteren hat man die Framerate der Visualisierung angehoben indem man nicht immer die komplette ildschirmseite neu läd, sondern lediglich die Bereiche, die dynamischen Inhalt repäsentieren.
+		Als serielle Schnittstelle ist ttyAMA0 verwendet.
 		\newpage
 	\section{Arduino}
-		Die Software des Arduinos wurde, nicht in der Arduino Entwicklungsumgebung
-		geschrieben. Stattdessen habe ich auf die IDE AtmelStudio 7  zurückgegriffen und den Mikrocontroller
-		per ISP beschrieben. Der Bootloader des Arduino wurde dazu entfernt.
+		Die Software des Arduinos ist nicht in der Arduino Entwicklungsumgebung
+		geschrieben. Stattdessen hat man auf die IDE AtmelStudio 7 zurückgegriffen und den Mikrocontroller per ISP beschrieben.
+		Der Bootloader des Arduino wurde dazu entfernt.
 		Gründe dazu waren unter anderem die Wahl der Sprache C++,
 		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen (Timer, Hardwareinterrupts...).
-		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern. Zu Beginn des Programms wird die ganze Peripherie konfiguriert und die globalen Variablen mit ihren default Werten geladen.
-		Anschließend werden die Interrupts global freigegeben. Ab hier ist die Steuerung funktionsfähig.\\
+		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern.
+		Zu Beginn des Programms wird die ganze Peripherie konfiguriert und die globalen Variablen mit ihren default Werten geladen.
+		Anschließend werden die Interrupts global freigegeben. Ab hier ist die Carrerabahn funktionsfähig.\\
 		\subsection{Interrupts}
 		\begin{figure}[ht]
 			\centering
@@ -154,8 +154,9 @@ Die oben genannten Probleme sollten durch ein neues Steuer-/Regelkonzept gelöst
 			\\Quelle:Mikrocontroller.net}
 			\label{Programmablauf}
 		\end{figure}
-Der Programmablauf ist größtenteils interruptgesteuert.
+Der Programmablauf ist größtenteils interruptgesteuert und folgt damit dem Modell in Abbildung \ref{InterruptgesteuerterProgrammablauf}.
 			Dies hat den Vorteil, dass das Timing nichtmehr von der Länge der MainLoop abhängt und Dinge wie zum  Beispiel der Regelalgorithmus immer mit der selben Frequenz aufgerufen werden.
+			In der Mainloop des Programms werden zeitunkritische Dinge erledigt, wie die LEDs der HMI zu aktualisieren.
 			Interruptquellen des Programms sind:
 			\begin{itemize}
 				\item Timer  (Abschnitt \ref{subsubsec:Timer})
@@ -179,7 +180,7 @@ Der Programmablauf ist größtenteils interruptgesteuert.
 %HIER WEITER
 			\subsubsection{Timer}\label{subsubsec:Timer}
 			Für Die Funktion der Steuerung werden viele Timer benötigt.\\
-			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, wurde deren Funktionalität in einem Software-Timer nachgebildet.
+			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, hat man deren Funktionalität in einem Software-Timer nachgebildet.
 			Dieser bezieht sein Takt von einem Hardwaretimer.
 			Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
 				\begin{table}[ht]
@@ -222,15 +223,16 @@ Der Programmablauf ist größtenteils interruptgesteuert.
 					\label{tab:belegungTimer}
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
-			Wenn ein Auto auf, Beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
-			Dies wurde realisiert, imdem man sich den Zustand des letzten Pin Change Interrupt gemerkt hat und diesen mit dem aktuellen Zustand, des jeweiligen Ports, durch ein Exklusivoder verknüpft.
+			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
+			Dies hat man realisiert, imdem man sich den Zustand des letzten Pin Change Interrupt gemerkt hat und diesen mit dem aktuellen Zustand, des jeweiligen Ports, durch ein Exklusivoder verknüpft.
 			Außerdem gibt es die zwei Möglichkeiten:
 				\begin{itemize}
-					\item war es ein High $\rightarrow$ Low Übergang
-					\item war es ein Low $\rightarrow$ High Übergang
+					\item war es ein \emph{High$\rightarrow$Low} Low Übergang
+					\item war es ein \emph{Low$\rightarrow$High} Übergang
 				\end{itemize}
-			Hat ein \emph{High-Low} Übergang stattgefunden, wird ein Event erzeugt.
-			Zum Entprellen des Eingangs wird direkt, nachdem das Event gehandelt wurde, der Eingang deaktiviert. Danach wird ein Software-Timer gestartet der den Eingang nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Überahren des Sensors, das dementsprechende Event nur einmal triggert.
+			Hat ein \emph{High$\rightarrow$Low} Übergang stattgefunden, wird ein Event erzeugt.
+			Bei einem \emph{Low$\rightarrow$High} Übergang wird kein Event ausgelöst.
+			Zum Entprellen des Eingangs wird direkt, nachdem das Event gehandelt wurde, der Eingang deaktiviert. Danach wird ein Software-Timer gestartet der den Eingang nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Übefahren des Sensors, das dementsprechende Event nur einmal triggert.
 			Analog zu dem Sensor 0, ist dies für jeden Sensor sowie Taster implementiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
 			\begin{table}[ht]
 				\begin{tabular}{|l|l|l|}
