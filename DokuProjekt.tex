@@ -17,36 +17,47 @@
 \parindent 0pt
 
 
-\title{Dokumentation der Projektarbeit}
+\title{Dokumentation der Projektarbeit - Carrera Bahn}
 \author{Florian Weber - 44907}
 \date{\today}
 
 \begin{document}
 \maketitle	%Deckblatt
-\newpage
+
 
 \tableofcontents 	%Inhaltsverzeichnis
 \listoffigures		%Bildverzeichnis
 \newpage
 
-\chapter{Zustand der Carrerabahn vor der Projektarbeit}
-Zu Beginn des Projekts ist die Carrera Bahn auf dem Stand, dass die Fahrzeuge konventionell sowie automatisiert betrieben werden können. Außerdem ist die Rundenzeitmessung und deren Visualisierung bereits realisiert. Bei der Energieversorgung kann zwischen Solarstrom und Netzversorgung gewählt werden.
+\chapter{Aufbau der Carrera Bahn}%TITEL ÜBERARBEITEN
+	\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
+	\caption{Überblick über die Carrera Bahn mit den Photovoltaik Modulen, der Steuerung mit dem Human Interface Device (HMI) sowie der Bahn mit den markierten Sensorpositionen}
+	\label{img:carrerakomplett}
+	\end{figure}
+Die Carrera Bahn ist in Abbildung \ref{img:carrerakomplett} dargestellt. Sie ermöglicht es, zwei Autos gegeneinander antreten zu lassen. Dabei kann bei jedem Auto gewählt werden, ob es automatisch fährt oder durch einen Nutzer manuell gesteuert wird. Die Energieversorgung der jeweiligen Bahn kann unabhängig davon gewählt werden. Es ist dadurch zum Beispiel möglich, als Studierender ein Auto mit Netzstrom manuell, gegen ein automatisch fahrendes Auto, welches mit Solarstrom betrieben wird, zu steuern.
+ Dies soll die Chancengleichheit der zwei Energieversorgungen demonstrieren. %
+
+\section{Zustand der Carrera Bahn vor der Projektarbeit}
+Zu Beginn des Projekts ist die Carrera Bahn auf dem Stand, dass die Fahrzeuge schon konventionell sowie automatisiert betrieben werden können. Außerdem ist die Rundenzeitmessung und deren Visualisierung bereits realisiert. Bei der Energieversorgung kann zwischen Solarstrom und Netzversorgung gewählt werden.
 Die Solarstromversorgung wird pro Bahn durch 2 Solarpanels und einem Tiefsetzsteller mit konstantem Dutycycle hergestellt, die Netzstromversorgung mit einem 15V Schaltnetzteil.
 
-Die manuelle Steuerung der Fahrzeuge durch den Nutzer ist realisiert, indem die klassischen Carrera Handregler, als variablen Vorwiderstand zu den Fahrzeugen eingesetzt sind. Im automatisierten Modus ist es möglich, mit einem 5W Potentiometer die Geschwindigkeit der langsamen Streckenabschnitte einzustellen. In den schnellen Steckenabschnitten, überbrückt ein Relais diesen Potentiometer und es liegt die volle Betriebsspannung der jeweiligen Energieversorgung an dem Auto an.
+Die manuelle Steuerung der Fahrzeuge durch den Nutzer ist realisiert, indem die klassischen Carrera Handregler, als variablen Vorwiderstand zu den Fahrzeugen eingesetzt werden. Im automatisierten Modus ist es möglich, mit je einem 5W Potentiometer die Geschwindigkeit des langsamen Streckenabschnittes einzustellen. In dem schnellen Steckenabschnitt (dem Looping) überbrückt ein Relais diesen Potentiometer und es liegt die volle Betriebsspannung, der jeweiligen Energieversorgung am Auto an.
+\newpage
 \section{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}
 Der zuvor erwähnte Aufbau der vorhandenen Anlage vor der Projektarbeit weist einige Probleme auf:
 \begin{itemize}
-	\item{1.} Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt. (Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung nicht)
-	\item{2.} Drift des Widerstandswerts des Potentiometer um den Arbeitspunkt im automatisierten Modus einzustellen (Temperaturdrift).
+	\item{1.} Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt. (Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung eine unstabilisierte Quelle.)
+	\item{2.} Temperaturdrift des Widerstands des Potentiometers um den Arbeitspunkt im automatisierten Modus.
 	\item{3.} Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
 	\item{4.} Manchmal wird durch einen Aliasingeffekt das Überfahren eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten. (Echtzeitfähigkeit des Betriebssystems Raspian ist nicht gegeben)
 \end{itemize}
 Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein Mikrocontroller mit echtzeitfähiger Software gelöst.
-\newpage
+
 
 \chapter{Funktion - Hardware}
-	Im Folgenden wird der grundlegende Aufbau der Carrera Bahn erklärt.
+	Im Folgenden wird der grundlegende Aufbau der Carrera Bahn nach Abschluss der Projektarbeit erklärt.
 
 	Diese Beschreibung ist immer nur für Bahn-A, da die
 	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
@@ -59,39 +70,40 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 		\item{3.} Nach dem Looping $\rightarrow$ Startlinie
 	\end{itemize}
 	Auf Abschnitt 1 und Abschnitt 3 wird im automatisierten Modus die mittlere Geschwindigkeit des Autos geregelt.
-	Im Looping (Abschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
+	Im Looping (Streckenbschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
 	Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
-	\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
-	\caption{Überblick über die Carrera-Bahn}
-	\label{img:carrerakomplett}
-	\caption*{jhfghj}
-	\end{figure}
+
 
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
-		\caption{Signalfluss}
+		\caption{Signalflussbild der Steuerung.}
 		\label{img:signalfluss}
 	\end{figure}
-	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss auf der Carrerabahn dargestellt. Auf der Bahn stellt der Arduino das zentrale Element dar. In der Abbildung ist dargestellt, das der Arduino die Sensoren in den Schienen, sowie die Taster des Human Maschine Interfaces (HMI) parallel einliest. Die Analogen Größen (Ausgangsspannung Tiefsetzsteller (TSS), Spannung über Strommessshunt TSS, Ausgangsspannung Handregler) sind an den Analog-Digital-Wandler des Arduinos angeschlossen. Der Arduino generiert außerdem die zwei PWM-Signale, die von den Tiefsetzstellern benötigt werden über einen Hardwaretimer. Dies ist genauer in Abschnitt \ref{subsec:PWM} beschrieben. Um eine Visualisierung zu realisieren ist ein RaspberryPi per UART (Universal Asynchronous Receiver Transmitter) seriell angebunden. Wie die anderen Kommunikationsverbindungen, ist auch diese Verbindung nur unidirektional ausgeführt.
+	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss auf der Carrera Bahn dargestellt. Auf der Bahn stellt der Arduino das zentrale Element dar.
+	Der Arduino liest die Sensoren in den Schienen, sowie die Taster des Human Maschine Interfaces (HMI) parallel ein und gibt die Signale der Leds, welche den aktuellen Zustand des jeweils aktiven Modus signalisieren, parallel aus.
+	Die Analogen Größen (Ausgangsspannung Tiefsetzsteller (TSS), Spannung über Strommessshunt TSS, Ausgangsspannung Spannungsteiler Handregler) sind an den Analog-Digital-Wandler (ADC) des Arduinos angeschlossen.
+	Der Arduino generiert außerdem die zwei PWM-Signale, die von den Tiefsetzstellern benötigt werden über einen 8-bit Hardwaretimer. Dies ist genauer in Abschnitt \ref{subsec:PWM} beschrieben. Um eine Visualisierung zu realisieren ist ein RaspberryPi per UART (Universal Asynchronous Receiver Transmitter) seriell angebunden. Wie die anderen Kommunikationsverbindungen, ist auch diese Verbindung nur unidirektional ausgeführt.
 	Die genaue Implementierung der Schnittstellen ist in den jeweiligen Kapiteln genauer beschrieben.
 	\section{Sensoren}
-			Wie in Abbildung \ref{img:carrerakomplett} zu sehen ist, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranke ausgeführt. Sensor 0 befindet sich am Start, Sensor 1 vor dem Looping und Sensor 2 Nach dem Looping.\\
+			Wie in Abbildung \ref{img:carrerakomplett} zu sehen ist, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranke ausgeführt. Sensor 0 befindet sich am Start von Bahn A, Sensor 1 vor dem Looping und Sensor 2 Nach dem Looping.\\
 
 
-		Sensor 0 wird im Wesentlichen zur Zeitmessung genutzt.
+		Sensor 0 wird ausschließlich zur Zeitmessung genutzt.
 		Sensor 1 wird genutzt um ein Signal zu generieren, so dass die Steuerung das Auto im Automatik-Modus für den Looping beschleunigen kann.
 		Das Signal von Sensor 2 wird schließlich genutzt um nach dem Looping wieder die langsame Geschwindigkeit zu triggern.\\
+		Sensor 3 bis 5 stellen die selben Signale, analog zu Bahn A, von Bahn B bereit.
 
 		Im manuellen Modus dienen die Sensoren nur zur Zeitmessung für die Visualisierung.
-		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen werden die Signale der Bahnsensoren durch Hardware Pin Change Interrupts des Atmega2560 digitalisiert.
+
+		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen werden die Signale der Bahnsensoren durch Hardware Pin Change Interrupts (PCINT) des Atmega2560 digitalisiert.
+		Die Funktionsweise dieser PCINTs ist genauer im Abschnitt \ref{subsubsec:PCINT} erklärt
 	\section{Bedienschnittstelle}
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.95\textwidth]{rec/hid.png}
-			\caption{Bedienschnittstelle}
+			\caption{Bedienschnittstelle mit Arduino und RaspberryPi}
+			%\caption*{Bedienschnittstelle für beide Bahnen sowie Arduino und Raspberry Pi}
 			\label{img:hid}
 		\end{figure}
 		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus 3 Wechseltaster mit Mittelstellung sowie einem Wechselschalter mit Mittelstellung.
@@ -136,7 +148,7 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen (Timer, Hardwareinterrupts...).
 		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern.
 		Zu Beginn des Programms wird die ganze Peripherie konfiguriert und die globalen Variablen mit ihren default Werten geladen.
-		Anschließend werden die Interrupts global freigegeben. Ab hier ist die Carrerabahn funktionsfähig.\\
+		Anschließend werden die Interrupts global freigegeben. Ab hier ist die Carrera Bahn funktionsfähig.\\
 		\subsection{Interrupts}
 		\begin{figure}[ht]
 			\centering
@@ -229,7 +241,7 @@ Der Programmablauf ist größtenteils interruptgesteuert und folgt damit dem Mod
 			Dies hat man realisiert, imdem man sich den Zustand des letzten Pin Change Interrupt gemerkt hat und diesen mit dem aktuellen Zustand, des jeweiligen Ports, durch ein Exklusivoder verknüpft.
 			Außerdem gibt es die zwei Möglichkeiten:
 				\begin{itemize}
-					\item war es ein \emph{High$\rightarrow$Low} Low Übergang
+					\item war es ein \emph{High$\rightarrow$Low} Übergang
 					\item war es ein \emph{Low$\rightarrow$High} Übergang
 				\end{itemize}
 			Hat ein \emph{High$\rightarrow$Low} Übergang stattgefunden, wird ein Event erzeugt.
@@ -345,7 +357,7 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 
 \chapter{Bedienungsanleitung}
 \section{Einschalten}
-	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald Die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist Die Carrerabahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
+	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald Die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist die Carrera Bahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
 \section{Betrieb}
 	\begin{figure}[ht]
 		\centering
@@ -353,7 +365,7 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 		\caption{Zustandsautomat Betriebsmodi}
 		\label{img:Betriebsmodi}
 	\end{figure}
-	Die Carrera-Bahn beherrscht 2 Modi.
+	Die Carrera Bahn beherrscht 2 Modi.
 	\begin{itemize}
 		\item Manuelles Fahren
 		\item Automatisiertes Fahren
@@ -383,7 +395,7 @@ Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abb
 Nun muss man warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne Led auf dem RaspberryPi nichtmehr blinkt und der Bildschirm in den Standby-Modus schaltet.
 \chapter{Zusammenfassung}
 Die Zu Beginn definierten Ziele der Projektarbeit wurden durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle erreicht. Lediglich die Robustheit der Anlage ist ist nicht vollsändig gegeben, da gelegentlich ein Auto im Looping herunterfällt.
-Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Automatisierung und Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrerabahn.
+Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Automatisierung und Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrera Bahn.
 Man hat herausgefunden dass im Looping die Stromschiene auf der Bahn, ein wenig in der Oberfläche versenkt ist und der Übergang zwischen den zusammengesteckten Streckenstücken einen unstetigen Verlauf hat. Dadurch ergibt sich eine Diskontinuität des Stroms durch den Antrieb des Fahrzeugs im Looping, was zu Geschwindigkeitsverlust, sowie letztendlich zum Absturz des Fahrzeugs führt. Biegt man nun die Strombürsten des Fahrzeugs weiter in Richtung Schiene um die schlechte Mechanische Beschaffenheit auszugleichen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nichtmehr verlässlich.
 Ein weitere Randbedingung für die Realisierung war dass die Automatisierung unabhängig von der länge der Strecke funktionieren sollte.
 Aufgrund dieser Forderung musste die Funktionalität, das Auto auf der Geraden zu beschleunigen verworfen werden, da dies nun nichtmehr in Abhängigkeit einer konstante Zeit realisiert werden kann. Als weiterführende Verbesserung könnte man zusätzliche Sensoren vor der Kurve zum abremsen einbauen.
