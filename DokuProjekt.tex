@@ -3,7 +3,7 @@
 \setcounter{secnumdepth}{4}
 \usepackage{a4}
 
-
+\usepackage{pdfpages}
 \usepackage[utf8]{inputenc}
 \usepackage{dsfont}
 \usepackage{amsmath}
@@ -13,7 +13,8 @@
 \usepackage[ngerman]{babel}
 \usepackage[font=small,labelfont=bf,margin=\parindent,tableposition=top]{caption}
 \usepackage{subcaption}
-\usepackage[colorlinks, pdfpagelabels, pdfstartview = FitH, bookmarksopen = true, bookmarksnumbered = true, linkcolor = black, plainpages = false, hypertexnames = false, citecolor = black] {hyperref}
+
+\usepackage[colorlinks, pdfpagelabels, pdfstartview = FitH, bookmarksopen = true, bookmarksnumbered = true, linkcolor = black, plainpages = false, hypertexnames = false, citecolor = black, urlcolor = blue] {hyperref}
 \parindent 0pt
 
 
@@ -29,7 +30,7 @@
 \listoffigures		%Bildverzeichnis
 \newpage
 
-\chapter{Aufbau der Carrera Bahn}%TITEL ÜBERARBEITEN
+\chapter{Vorwort}%TITEL ÜBERARBEITEN
 	\begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
@@ -61,8 +62,7 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 
 	Diese Beschreibung ist immer nur für Bahn-A, da die
 	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
-	\ref{img:carrerakomplett} Bezug genommen.
-
+	\ref{img:carrerakomplett} Bezug genommen.\\
 	Die Sensoren in den Schienen teilen die Bahn in 3 Streckenabschnitte auf:
 	\begin{itemize}
 		\item{1.} Startlinie $\rightarrow$ Vor dem Looping
@@ -72,21 +72,22 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 	Auf Abschnitt 1 und Abschnitt 3 wird im automatisierten Modus die mittlere Geschwindigkeit des Autos geregelt.
 	Im Looping (Streckenbschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
 	Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
-
-
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
-		\caption{Signalflussbild der Steuerung.}
+		\caption{Signalflussbild der Steuerung. Arduino liest Signale von Sensoren, sowie Tastern parallel aus und misst die Ausgangsspannung der Tiefsetzsteller (TSS) und Handregler. Auf Grundlage dieser Daten, generiert der Arduino die PWM Signale für die TSS und leitet die Sensordaten per Universal Asynchronous Receiver Transmitter (UART), an den RaspberryPi, zur Rundenzeitmessung weiter.}
 		\label{img:signalfluss}
 	\end{figure}
-	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss auf der Carrera Bahn dargestellt. Auf der Bahn stellt der Arduino das zentrale Element dar.
-	Der Arduino liest die Sensoren in den Schienen, sowie die Taster des Human Maschine Interfaces (HMI) parallel ein und gibt die Signale der Leds, welche den aktuellen Zustand des jeweils aktiven Modus signalisieren, parallel aus.
-	Die Analogen Größen (Ausgangsspannung Tiefsetzsteller (TSS), Spannung über Strommessshunt TSS, Ausgangsspannung Spannungsteiler Handregler) sind an den Analog-Digital-Wandler (ADC) des Arduinos angeschlossen.
-	Der Arduino generiert außerdem die zwei PWM-Signale, die von den Tiefsetzstellern benötigt werden über einen 8-bit Hardwaretimer. Dies ist genauer in Abschnitt \ref{subsec:PWM} beschrieben. Um eine Visualisierung zu realisieren ist ein RaspberryPi per UART (Universal Asynchronous Receiver Transmitter) seriell angebunden. Wie die anderen Kommunikationsverbindungen, ist auch diese Verbindung nur unidirektional ausgeführt.
+	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss der Carrera Bahn dargestellt.
+	Auf der Bahn stellt der Arduino das zentrale Element dar.
+	Dieser liest die Sensoren in den Schienen, sowie die Taster des Human Maschine Interfaces (HMI) parallel ein und gibt die Signale der LEDs, welche den aktuellen Zustand des jeweils aktiven Modus signalisieren, parallel aus.
+	Die analogen Größen (Ausgangsspannung Tiefsetzsteller (TSS), Spannung über Strommessshunt TSS, Ausgangsspannung Spannungsteiler Handregler) sind an den Analog-Digital-Wandler (ADC) des Arduinos angeschlossen.
+	Der Arduino generiert außerdem die zwei PWM-Signale, die von den Tiefsetzstellern benötigt werden, über einen 8-bit Hardwaretimer.
+	Dies ist genauer in Abschnitt \ref{subsec:PWM} beschrieben.
+	Um eine Visualisierung zu realisieren ist ein RaspberryPi per Universal Asynchronous Receiver Transmitter (UART) seriell angebunden. Wie die anderen Kommunikationsverbindungen, ist auch diese Verbindung nur unidirektional ausgeführt.
 	Die genaue Implementierung der Schnittstellen ist in den jeweiligen Kapiteln genauer beschrieben.
 	\section{Sensoren}
-			Wie in Abbildung \ref{img:carrerakomplett} zu sehen ist, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranke ausgeführt. Sensor 0 befindet sich am Start von Bahn A, Sensor 1 vor dem Looping und Sensor 2 Nach dem Looping.\\
+		Wie in Abbildung \ref{img:carrerakomplett} zu sehen ist, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranken ausgeführt. Sensor 0 befindet sich am Start von Bahn A, Sensor 1 vor dem Looping und Sensor 2 nach dem Looping.\\
 
 
 		Sensor 0 wird ausschließlich zur Zeitmessung genutzt.
@@ -96,14 +97,14 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 
 		Im manuellen Modus dienen die Sensoren nur zur Zeitmessung für die Visualisierung.
 
-		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen werden die Signale der Bahnsensoren durch Hardware Pin Change Interrupts (PCINT) des Atmega2560 digitalisiert.
+		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen werden die Signale der Bahnsensoren durch Hardware Pin Change Interrupts (PCINT) des Arduino digitalisiert.
 		Die Funktionsweise dieser PCINTs ist genauer im Abschnitt \ref{subsubsec:PCINT} erklärt
-	\section{Bedienschnittstelle}
+	\section{Human Human Maschine Interface}
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.95\textwidth]{rec/hid.png}
-			\caption{Bedienschnittstelle mit Arduino und RaspberryPi}
-			%\caption*{Bedienschnittstelle für beide Bahnen sowie Arduino und Raspberry Pi}
+			\caption{HMI mit Arduino, RaspberryPi und TSS}
+
 			\label{img:hid}
 		\end{figure}
 		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus 3 Wechseltaster mit Mittelstellung sowie einem Wechselschalter mit Mittelstellung.
@@ -114,63 +115,55 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 		Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen.
 	\section{Arduino}
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
-		Diesen hat man gewählt, da es sich um eine preiswerte Platine handelt, welche bereits die wichtigsten Beschaltungen des Mikrokontrollers enthält.
-		Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, den man nutzen kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
+		Dieser ist mit einem ATmega2560 der Firma Microchip bestückt.
+		%warum wird ein arduino eingesetzt?
+		%debug funktion
+		%tacktung 16MHz
+		%5v Versorgungsspannung
+
+		Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, der genutzt wird, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
+
 	\section{RaspberryPi}
-		Die Visualisierung ist durch ein RaspberryPi Model 3 B realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Reset Tasters der Visualisierung (siehe Abbildung \ref{img:hid}).
-		Die Visualisierung war zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
+		Die Visualisierung ist durch ein RaspberryPi Model 3 B+ realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung \grqq (siehe Abbildung \ref{img:hid}).
+		Die Visualisierung ist zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\section{Tiefsetzsteller}
 		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Schienen (innerer Regelkreis der Kaskadenregelung).
-		Jeder bekommt sein PWM-Signal (Stellgröße) direkt vom Arduino. Desweiteren ist über ein Shunt eine Strommessung realisiert.
+		Dabei sind die Bahnen jeweils direkt an die Ausgänge der beiden TSS angeschlossen.
+	  Der Arduino generiert die zwei PWM Signal für die TSS.
+		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch die PWM Signale auf ihre aktuellen Sollwerte geregelt.
+		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs %HIEEEEEER ZAHLENWERT EINTRAGEN EVT MESSEN !!!
+		nach oben hin begrenzt.
+		Da diese größer sein kann wie die Referenzspannung des ADC (interne Referenzspannung von 2.56V), wird sie über einen Spannungsteiler angepasst und kann damit auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt werden.
+		Desweiteren ist über ein Shunt eine Strommessung realisiert.
 		Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
 		verarbeitet und ist lediglich für weiterführende Projekte gedacht.
-		Da die Ausgangsspannung des Tiefsetzstellers (lediglich begrenzt durch die Leerlaufspannung eines PV-Strangs) größer sein kann wie die Referenzspannung des ADC (interne Referenzspannung von 2.56V), wird diese über einen Spannungsteiler angepasst und auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt.
-		Diese Spannung stellt die Regelgröße dar.
-	\newpage
 
 \chapter{Software}
 	\section{RaspberryPi}
 
-		Bei der Software die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
-
-		Dieses war zu Beginn der Projektarbeit bereits vorhanden und hat die Sensoren
-		der Bahn parallel mit dem GPIO-Port eingelesen. Mit den Flanken der Sensoren wurde die Rundenzeit gemessen und die Bestzeit pro Bahn ermittelt.\\
-		Dieses Skript hat man größtenteils übernommen und lediglich in der Richtung abgeändert, dass die Trigger-Signale der Sensoren nun über die serielle Schnittstelle dem Pi mitgeteilt werden.
-		Desweiteren hat man die Framerate der Visualisierung angehoben indem man nicht immer die komplette ildschirmseite neu läd, sondern lediglich die Bereiche, die dynamischen Inhalt repäsentieren.
-		Als serielle Schnittstelle ist ttyAMA0 verwendet.
-		\newpage
+		Bei der Software, die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
+		Das Script bekommt die Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung \grqq, über die serielle Schnittstelle \glqq ttyAMA0 \grqq, gesendet und führt eine Rundenzeitmessung je Bahn durch.
+		Diese Zeitmessung wird auf dem Bildschirm angezeigt.
+		Zum Rendern der schrften sowie dem Hintergrundbild, ist die Open Source Bibliothek \glqq PyGame\grqq in Verwendung.
+		Das Bild ist separiert in einen Hintergrund und einem Block der den dynamischen Inhalt der Rundenzeitmessung enthält.
+		Um die Framerate entgegen der Version aus einer vorherigen Arbeit zu steigern, wird lediglich der dynamische Inhalt framweise neu gerendert.
 	\section{Arduino}
-		Die Software des Arduinos ist nicht in der Arduino Entwicklungsumgebung
-		geschrieben. Stattdessen hat man auf die IDE AtmelStudio 7 zurückgegriffen und den Mikrocontroller per ISP beschrieben.
+		Die Software des Arduinos ist nicht in der Arduino Entwicklungsumgebung geschrieben, da dies einen direkten Zugriff auf die Hardware erschwert und der Programmablauf bereits vorgegeben wäre.
+		Stattdessen ist die Software in der integrierten Entwicklungsumgebung (IDE) \glqq Atmelstudio 7.0 \grqq entwickelt.
 		Der Bootloader des Arduino wurde dazu entfernt.
-		Gründe dazu waren unter anderem die Wahl der Sprache C++,
-		aber auf die Möglichkeit direkt auf die Hardware zuzugreifen (Timer, Hardwareinterrupts...).
-		Letzteres ist notwendig um das Timing des Controllers exakt zu steuern.
-		Zu Beginn des Programms wird die ganze Peripherie konfiguriert und die globalen Variablen mit ihren default Werten geladen.
-		Anschließend werden die Interrupts global freigegeben. Ab hier ist die Carrera Bahn funktionsfähig.\\
+		Dies ermöglicht nun einen direkten Zugriff auf die Prozessorregister und damit Konfiguration der einzelnen Komponenten des Mikrocontrollers, auf dem Arduino.
+		Dies ist notwendig, um das Timing des Controllers exakt zu steuern und ist effizienter als für alle Hardwarekomponenten eine Bibliothek zu nutzen , wie es die Arduino Entwicklungsumgebung vorsehen würde.
 		\subsection{Interrupts}
 		\begin{figure}[ht]
 			\centering
-			\begin{subfigure}{0.47\textwidth}
-				\centering
-				\includegraphics[width=1.1\textwidth]{rec/Interrupt_Programme.png}
-				\caption{Interruptgesteuerter \\Programmablauf}
-				\label{InterruptgesteuerterProgrammablauf}
-			\end{subfigure}
-			\begin{subfigure}{0.47\textwidth}
-				\centering
-				\includegraphics[width=0.55\textwidth]{rec/Sequentielle_Programme.png}
-				\caption{Sequentieller \\Programmablauf}
-				\label{SequentiellerProgrammablauf}
-			\end{subfigure}
-			\caption[Möglichkeiten zum Programmablauf]{Möglichkeiten zum Programmablauf
-			\\Quelle:Mikrocontroller.net}
-			\label{Programmablauf}
+			\includegraphics[width=0.8\textwidth]{rec/Interrupt_Programme.png}
+			\caption{Interruptgesteuerter Programmablauf \hyperref[src:scout1]{[scout1]}}
+			\label{InterruptgesteuerterProgrammablauf}
 		\end{figure}
-Der Programmablauf ist größtenteils interruptgesteuert und folgt damit dem Modell in Abbildung \ref{InterruptgesteuerterProgrammablauf}.
-			Dies hat den Vorteil, dass das Timing nichtmehr von der Länge der MainLoop abhängt und Dinge wie zum  Beispiel der Regelalgorithmus immer mit der selben Frequenz aufgerufen werden.
-			In der Mainloop des Programms werden zeitunkritische Dinge erledigt, wie die LEDs der HMI zu aktualisieren.
+Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildung \ref{InterruptgesteuerterProgrammablauf}.
+			Dies hat den Vorteil, dass das Timing nicht mehr von der Länge der MainLoop abhängt und Vorgänge wie zum  Beispiel der Regelalgorithmus immer mit der selben Frequenz ausgeführt werden.
+			In der Mainloop des Programms werden zeitunkritische Aufgaben erledigt, wie die LEDs der HMI zu aktualisieren.
 			Interruptquellen des Programms sind:
 			\begin{itemize}
 				\item Timer  (Abschnitt \ref{subsubsec:Timer})
@@ -193,9 +186,9 @@ Der Programmablauf ist größtenteils interruptgesteuert und folgt damit dem Mod
 			\end{itemize}
 %HIER WEITER
 			\subsubsection{Timer}\label{subsubsec:Timer}
-			Für Die Funktion der Steuerung werden viele Timer benötigt.\\
-			Da im Mikrocontroller allerdings nur begrenzt Timer zur Verfügung stehen, hat man deren Funktionalität in einem Software-Timer nachgebildet.
-			Dieser bezieht sein Takt von einem Hardwaretimer.
+			Für die Funktion der Steuerung werden viele Timer benötigt.\\
+			Da im Mikrocontroller allerdings nur begrenzt Hardwaretimer zur Verfügung stehen, ist deren Funktionalität in einem Softwaretimer nachgebildet.
+			Dieser bezieht seinen Takt von dem  Hardwaretimer \glqq Timer4\grqq.
 			Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
 				\begin{table}[ht]
 					\begin{tabular}{|l|l|l|}
@@ -237,16 +230,18 @@ Der Programmablauf ist größtenteils interruptgesteuert und folgt damit dem Mod
 					\label{tab:belegungTimer}
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
-			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Da Sensor 0 an PCINT16 angeschlossen ist und 16 im Bereich [16,23] liegt, wird das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der ISR (Interrupt Service Routine) muss nun unterschieden werden, durch welchen Pin das Interrupt ausgelöst wurde.
-			Dies hat man realisiert, imdem man sich den Zustand des letzten Pin Change Interrupt gemerkt hat und diesen mit dem aktuellen Zustand, des jeweiligen Ports, durch ein Exklusivoder verknüpft.
-			Außerdem gibt es die zwei Möglichkeiten:
+			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Sensor 0 ist nach Tabelle \ref{tab:belegungpcint} an PCINT16 angeschlossen. Aus dem Datenblatt des Mikrocontrollers (ATmega2560) geht hervor, dass für die Pin Chage Interrupts, drei Interruptvektoren vorgesehen sind. Dabei besteht eine Zuordnung von jeweils immer 8 PCINT Pins an einen Interruptvektor. Diese Zuordnung beginnt bei dem Pin PCINT0 und PCINT0\underline{}vect. Durch das Überfahren des Autos über den Sensor, wird also das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der Interrupt Service Routine (ISR) muss nun unterschieden werden, durch welchen Pin, das Interrupt ausgelöst wurde.
+			Die Lösung dieses Problems ist gegeben, indem der Signalpegel der PCINT Pins in der letzten ISR gesichert wurden. Nun wird das aktuelle Eingangsbyte des Ports mit dem zuvor gespeicherten bitweise exklusiv-oder verknüpft.
+Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt von dem ersten zugeordneten Pin des Interruptvektors. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat. 
+In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werden:
 				\begin{itemize}
-					\item war es ein \emph{High$\rightarrow$Low} Übergang
-					\item war es ein \emph{Low$\rightarrow$High} Übergang
+					\item \emph{High$\rightarrow$Low} Übergang
+					\item \emph{Low$\rightarrow$High} Übergang
 				\end{itemize}
-			Hat ein \emph{High$\rightarrow$Low} Übergang stattgefunden, wird ein Event erzeugt.
-			Bei einem \emph{Low$\rightarrow$High} Übergang wird kein Event ausgelöst.
-			Zum Entprellen des Eingangs wird direkt, nachdem das Event gehandelt wurde, der Eingang deaktiviert. Danach wird ein Software-Timer gestartet der den Eingang nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Übefahren des Sensors, das dementsprechende Event nur einmal triggert.
+			Hat ein \emph{High$\rightarrow$Low} Übergang stattgefunden, wird ein Event erzeugt und je nach PCINT Pin unterschiedlich behandelt.
+			Bei einem \emph{Low$\rightarrow$High} Übergang, kann das Ereignis verworfen werden.
+
+			Das Entprellen des Eingangs ist implementiert, indem nach dem Auslösen eines Events, die PCINT Funktion für den zugehörigen Pin deaktiviert wird, sodass dieser das Interrupt nicht mehr auslösen kann. Zusätzlich wird ein Softwaretimer gestartet, der die PCINT Funktion des Pins, nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Überfahren des Sensors, das dementsprechende Event nur einmal triggert.
 			Analog zu dem Sensor 0, ist dies für jeden Sensor sowie Taster implementiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
 			\begin{table}[ht]
 				\begin{tabular}{|l|l|l|}
@@ -310,50 +305,50 @@ Der Programmablauf ist größtenteils interruptgesteuert und folgt damit dem Mod
 		\newpage
 	\subsection{Analog Digital Wandler}\label{subsec:ADC}
 
-		Der Mikrocontroller des Arduinos (Atmel Atmega 2560) hat bereits einen 10 bit ADC (Analog Digital Converter) auf dem Chip integriert, sodass auf einen externen Wandler, verzichtet werden kann.
-		Da der Wandler immer nur eine Messung durchführen kann, hat der Hersteller ein (MUX) Multiplexer integriert, um zwischen den einzelnen ADC Pins des Mikrocontroller durchzuschalten.
-		Die Belegung der ADC Pins des Mikrocontrollers ist in Tabelle \ref{tab:AnhangBelegungArduino} enthalten.
+		Der Mikrocontroller des Arduinos (Atmega2560) hat bereits einen 10-bit Analog Digital Converter (ADC) auf dem Chip integriert, sodass auf einen externen Wandler, verzichtet wird.
+		Da der Wandler immer nur eine Messung durchführen kann, hat der Hersteller einen Multiplexer (MUX) integriert, um zwischen den einzelnen ADC Pins (Kanälen), des Mikrocontrollers durchzuschalten.
+		Die Belegung der ADC Pins ist in Tabelle \ref{tab:AnhangBelegungArduino} enthalten.
 
-		Wenn die angestoßene Messung des ADC abgeschlossen ist, wird ein Interrupt ausgelöst.
+		Immer wenn die angestoßene Messung des ADC abgeschlossen ist, wird ein Interrupt ausgelöst.
 
-
-		Die Steuerung des Multiplexers erfolgt über ein Zustandsautomat (Abbildung \ref{img:ADCMUX}), der immer dann ein Schritt weiter springt, wenn die letzte Messung des ADC abgeschlossen ist. In jedem Schritt des Automats, wird schematisch das Selbe durchgeführt:
+		Die Steuerung des MUX erfolgt über ein Zustandsautomat (siehe Abbildung \ref{img:ADCMUX}), der immer dann ein Schritt weiter springt, wenn dieses Interrupt eintritt. In jedem Schritt des Automats, wird schematisch dasselbe durchgeführt:
 		\begin{itemize}
-		\item	Letzter gemessener Wert in Variable speichern
+		\item	Letzter gemessener Wert in zugehörige Variable speichern
 		\item Nächste Messung vorbereiten (Multiplexer steuern und Messung anstoßen)
 		\end{itemize}
 
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.3\textwidth]{rec/ADCAutomat.png}
-			\caption{Zustandsautomat Analog Digital Converter Kanal}
+			\caption{Zustandsautomat MUX des ADC. Die Zustände(S0 bis S1) beschreiben, welcher ADC Pin des Mikrocontrollers gerade durch den MUX mit dem ADC verbunden ist. Die Transitionsbedingung (links) beschreibt das Ereignis, mit dem man von einem Zustand in den Nächsten wechselt. Ein Punkt markiert den Schritt in den Initialzustand (S0) des Automats und ein Pfeil einen Sprung zu einem darunter definierten Zustand.}
 			\label{img:ADCMUX}
 		\end{figure}
 
 \subsection{PWM Generierung Tiefsetzsteller}\label{subsec:PWM}
+
+
 \begin{figure}[htp]
 	\centering
-	\begin{subfigure}{0.34\textwidth}
-		\centering
-		\includegraphics[width=0.95\textwidth]{rec/zustandsautomatPWM.png}
-		\caption{Zustandsautomat PWM Generierung}
-		\label{fig:PWMGENAut}
-	\end{subfigure}
-	\begin{subfigure}{0.64\textwidth}
-		\centering
-		\includegraphics[width=0.95\textwidth]{rec/graphPWM.png}
-		\caption{Ausgang PWM-Pin als Funktion des Zählerstands}
-		\label{fig:PWMGENFX}
-	\end{subfigure}
+	\subcaptionbox{Zustandsautomat PWM Generierung
+        \label{fig:PWMGENAut}}
+        {\includegraphics[width=0.34\textwidth]{rec/zustandsautomatPWM.png}}
+        \hfill
+  \subcaptionbox{Ausgang PWM Pin als Funktion des Zählerstands
+        \label{fig:PWMGENFX}}
+        {\includegraphics[width=0.64\textwidth]{rec/graphPWM.png}}
+    \caption{Zustandsautomat des Timers zur PWM Generierung sowie resultierendes Ausgangssignal bei konstantem Dutycycle}
 
 
 \end{figure}
+
+
+
 
 Wie aus Abbildung \ref{fig:PWMGENFX} hervorgeht, ist das PWM Signal direkt eine Funktion des aktuellen Zählerstands von Timer0, sowie dem Inhalt des jeweiligen Overflow Compare Registers OCR0A/B.
 Die PWM Generierung ist durch den Mikrocontroller in Hardware implementiert und muss lediglich aktiviert werden. Die Konfiguration dieser PWM Generierung ist in der Funktion initTimer implementiert und wird einmal zu Programmstart aufgerufen. Der Hardwaretimer setzt nun den jeweiligen Pin beim Überlauf des 8-bit Timers (Wert 0) auf High-Pegel und beim Erreichen des Wertes im OCR0AB Registers ( zum Beispiel  bei DutyCycle = 50\% OCR0A = 127 ) auf Low-Pegel.
 Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildung  \ref{fig:PWMGENAut} als Zustandsautomat dargestellt.
 
-%wie wird pwm generiert
+
 
 \chapter{Bedienungsanleitung}
 \section{Einschalten}
@@ -402,8 +397,12 @@ Aufgrund dieser Forderung musste die Funktionalität, das Auto auf der Geraden z
 Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des RaspberryPi, sowie des Arduino auch autark über die Solarpanels zu ermöglichen.
 
 
+
+
+\chapter{Quellenverzeichnis}
+Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net. \\Von Mikrocontroller.net: \href{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}{\url{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}} abgerufen \label{src:scout1}
 \chapter{Anhang}
-\section{Pinbelegung}
+
 
 	\begin{table}[H]
 	\centering
@@ -443,7 +442,7 @@ Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des Raspberr
 			15 & Schiene B - Minus\\
 			\hline
 		\end{tabular}
-		\caption{Pinbelegung der Sub-D Buchse auf dem HID}
+		\caption{Pinbelegung der Sub-D Buchse auf dem HMI}
 		\label{tab:AnhangBelegungSUBD}
 	\end{table}
 
@@ -565,4 +564,6 @@ Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des Raspberr
 		\caption{Pinbelegung des Arduino}
 		\label{tab:AnhangBelegungArduino}
 	\end{table}
+
+
 \end{document}
