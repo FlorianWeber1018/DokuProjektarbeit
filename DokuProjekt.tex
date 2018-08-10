@@ -34,7 +34,7 @@
 	\begin{figure}[tb]
 	\centering
 	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
-	\caption{Überblick über die Carrera Bahn mit den Photovoltaik Modulen, der Steuerung mit dem Human Interface Device (HMI) sowie der Bahn mit den markierten Sensorpositionen}
+	\caption[Überblick über die Carrera Bahn]{Überblick über die Carrera Bahn mit den Photovoltaik Modulen, der Steuerung mit dem Human Interface Device (HMI), sowie der Bahn mit den markierten Sensorpositionen.}
 	\label{img:carrerakomplett}
 	\end{figure}
 Die Carrera Bahn ist in Abbildung \ref{img:carrerakomplett} dargestellt. Sie ermöglicht es, zwei Autos gegeneinander antreten zu lassen. Dabei kann bei jedem Auto gewählt werden, ob es automatisch fährt oder durch einen Nutzer manuell gesteuert wird. Die Energieversorgung der jeweiligen Bahn kann unabhängig davon gewählt werden. Es ist dadurch zum Beispiel möglich, als Studierender ein Auto mit Netzstrom manuell, gegen ein automatisch fahrendes Auto, welches mit Solarstrom betrieben wird, zu steuern.
@@ -75,7 +75,7 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
-		\caption{Signalflussbild der Steuerung. Arduino liest Signale von Sensoren, sowie Tastern parallel aus und misst die Ausgangsspannung der Tiefsetzsteller (TSS) und Handregler. Auf Grundlage dieser Daten, generiert der Arduino die PWM Signale für die TSS und leitet die Sensordaten per Universal Asynchronous Receiver Transmitter (UART), an den RaspberryPi, zur Rundenzeitmessung weiter.}
+		\caption[Signalflussbild der Steuerung]{Signalflussbild der Steuerung. \\Arduino liest Signale von Sensoren, sowie Tastern parallel aus und misst die Ausgangsspannung der Tiefsetzsteller (TSS) und Handregler. Auf Grundlage dieser Daten, generiert der Arduino die PWM Signale für die TSS und leitet die Sensordaten per Universal Asynchronous Receiver Transmitter (UART), an den RaspberryPi, zur Rundenzeitmessung weiter.}
 		\label{img:signalfluss}
 	\end{figure}
 	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss der Carrera Bahn dargestellt.
@@ -158,7 +158,7 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.8\textwidth]{rec/Interrupt_Programme.png}
-			\caption{Interruptgesteuerter Programmablauf \hyperref[src:scout1]{[scout1]}}
+			\caption[Interruptgesteuerter Programmablauf]{Interruptgesteuerter Programmablauf \hyperref[src:scout1]{[scout1]}}
 			\label{InterruptgesteuerterProgrammablauf}
 		\end{figure}
 Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildung \ref{InterruptgesteuerterProgrammablauf}.
@@ -320,7 +320,7 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.3\textwidth]{rec/ADCAutomat.png}
-			\caption{Zustandsautomat MUX des ADC. Die Zustände(S0 bis S1) beschreiben, welcher ADC Pin des Mikrocontrollers gerade durch den MUX mit dem ADC verbunden ist. Die Transitionsbedingung (links) beschreibt das Ereignis, mit dem man von einem Zustand in den Nächsten wechselt. Ein Punkt markiert den Schritt in den Initialzustand (S0) des Automats und ein Pfeil einen Sprung zu einem darunter definierten Zustand.}
+			\caption[Zustandsautomat des MUX im ADC]{Zustandsautomat des MUX im ADC.\\Die Zustände(S0 bis S1) beschreiben, welcher ADC Pin des Mikrocontrollers gerade durch den MUX mit dem ADC verbunden ist. Die Transitionsbedingung (links) beschreibt das Ereignis, mit dem man von einem Zustand in den Nächsten wechselt. Ein Punkt markiert den Schritt in den Initialzustand (S0) des Automats und ein Pfeil einen Sprung zu einem darunter definierten Zustand.}
 			\label{img:ADCMUX}
 		\end{figure}
 
@@ -336,7 +336,7 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
   \subcaptionbox{Ausgang PWM Pin als Funktion des Zählerstands
         \label{fig:PWMGENFX}}
         {\includegraphics[width=0.64\textwidth]{rec/graphPWM.png}}
-    \caption{Zustandsautomat des Timers zur PWM Generierung sowie resultierendes Ausgangssignal bei konstantem Dutycycle}
+    \caption{Zustandsautomat des Timers zur PWM Generierung, sowie resultierendes Ausgangssignal bei konstantem Dutycycle.}
 
 
 \end{figure}
@@ -352,12 +352,12 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 
 \chapter{Bedienungsanleitung}
 \section{Einschalten}
-	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald Die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist die Carrera Bahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
+	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist die Carrera Bahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
 \section{Betrieb}
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.png}
-		\caption{Zustandsautomat Betriebsmodi}
+		\caption[Zustandsautomat zum Wechsel der Betriebsmodi]{Zustandsautomat zum Wechsel der Betriebsmodi.\\Durch den \glqq HMI Taster Auto \grqq der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell \grqq, die Bahn in den Handbetrieb versetzten und das entsprechende Auto mit dem Handregler manuell steuern.}
 		\label{img:Betriebsmodi}
 	\end{figure}
 	Die Carrera Bahn beherrscht 2 Modi.
@@ -370,6 +370,7 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 	\subsection{Manuelles Fahren}\label{subsec:ManuellesFahren}
 		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die orginalen Carrera Handregler gesteuert
 		werden.
+\newpage
 	\subsection{Automatisiertes Fahren}
 		Der Automatisierte Modus ist aufgeschlüsselt in 2 Zustände:
 		\begin{itemize}
@@ -400,7 +401,9 @@ Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des Raspberr
 
 
 \chapter{Quellenverzeichnis}
-Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net. \\Von Mikrocontroller.net: \href{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}{\url{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}} abgerufen \label{src:scout1}
+Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net. 
+\\Von Mikrocontroller.net: \href{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}
+{\url{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}} abgerufen \label{src:scout1}
 \chapter{Anhang}
 
 
