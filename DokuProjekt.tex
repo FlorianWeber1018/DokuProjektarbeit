@@ -54,7 +54,7 @@ Der zuvor erwähnte Aufbau der vorhandenen Anlage vor der Projektarbeit weist ei
 	\item{3.} Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
 	\item{4.} Manchmal wird durch einen Aliasingeffekt das Überfahren eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten. (Echtzeitfähigkeit des Betriebssystems Raspian ist nicht gegeben)
 \end{itemize}
-Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein Mikrocontroller mit echtzeitfähiger Software gelöst.
+Die oben genannten Probleme sollen im Rahmen der Projektarbeit durch ein neues Steuer-/Regelkonzept, sowie einen Mikrocontroller mit echtzeitfähiger Software gelöst werden.
 
 
 \chapter{Funktion - Hardware}
@@ -99,7 +99,7 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 
 		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen werden die Signale der Bahnsensoren durch Hardware Pin Change Interrupts (PCINT) des Arduino digitalisiert.
 		Die Funktionsweise dieser PCINTs ist genauer im Abschnitt \ref{subsubsec:PCINT} erklärt
-	\section{Human Human Maschine Interface}
+	\section{Human Maschine Interface}
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.95\textwidth]{rec/hid.png}
@@ -109,10 +109,11 @@ Die oben genannten Probleme sind durch ein neues Steuer-/Regelkonzept, sowie ein
 		\end{figure}
 		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus 3 Wechseltaster mit Mittelstellung sowie einem Wechselschalter mit Mittelstellung.
 
-		Der Wechselschalter ist zum Auswählen der Energieversorgung der jeweiligen Bahn. Hierbei stehen die 2 Versorgungsmöglichkeiten Solar oder Netz zur Auswahl. Ist dieser Wechselschalter in Mittelstellung, wird die Bahn nicht versorgt und das Auto steht unabhängig des gewählten Modus.
-		Über Taster 0 beziehungsweise Taster 1 lässt sich der Modus der Bahn auswählen. Taster 0 steht für den manuellen Modus Von Bahn A, Taster 1 für den automatisierten. Der aktuell ausgewählte Modus wird durch die LEDs über bzw unter den Tastern signalisiert.
-		Mit Taster 2 lässt sich der Regler der Bahngeschwindigkeit, genauer Sollspannung außerhalb des Loopings, auf seinen Startwert zurücksetzen.
-		Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen.
+		Der Wechselschalter (\glqq Wechselschalter 0\grqq für Bahn A und \glqq Wechselschalter 1\grqq für Bahn B ) ist zum Auswählen der Energieversorgung der jeweiligen Bahn. In der oberen Stellung wird die Bahn mit Netzenergie versorgt, in der unteren Stellung mit Solarenergie. 
+Ist einer dieser Wechselschalter in Mittelstellung, wird die Bahn nicht versorgt und das entsprechende Auto steht, unabhängig des gewählten Modus.\\
+		Über die Wechseltaster 0 beziehungsweise Wechseltaster 2 lässt sich der Modus der zugehörigen Bahn auswählen. Dies erfolgt indem einer der Taster oben bzw unten betätigt wird.  Der aktuell ausgewählte Modus wird durch die LEDs über bzw unter den Tastern signalisiert. Das LED oben signalisiert dabei den Manuellen Modus, indem das Auto durch den Handregler  gesteuert wird und ein LED unten, den Modus indem das Auto selbstständig in fährt.\\
+Mit Wechseltaster 1  lassen sich die Integratoren der Regler der Bahngeschwindigkeit (Abbildung \ref{fig:Tcontrol}), welche ausschließlich im automatisierten Modus aktiv sind, auf ihren Startwert zurücksetzten. Dabei setzt ein oberer Tastendruck den Regler von Bahn A und ein unterer den Regler von Bahn B zurück. Diese Regler sind genauer in Abschnitt \ref{subsec:control} beschrieben.
+Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen. Dieser ist in Abblidung \ref{img:hmi} mit \glqq Reset Visualisierung \grqq beschriftet und befindet sich zwischen den zwei Tiefsetzstellern oben links.
 	\section{Arduino}
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
 		Dieser ist mit einem ATmega2560 der Firma Microchip bestückt.
@@ -285,12 +286,18 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 			Zum Betrieb des Zustandsautomats (Abbildung \ref{img:ADCMUX}) welcher den Multiplexer des ADC steuert ist ein Interrupt notwendig, welches ausgelöst wird, wenn der ADC eine Messung abgeschlossen hat. Dieser Automat ist genauer in Abschnitt \ref{subsec:ADC} beschrieben.
 
 			%erklärung an diesem
-	\subsection{Regler}
+	\subsection{Regler}\label{subsec:control}
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=\textwidth]{rec/Regler.pdf}
-			\caption{Kaskadenreglung Bahngeschwindigkeit}
-			\label{img:Regelung}
+			\caption{Spannungsregelung Bahn}
+			\label{fig:Ucontrol}
+		\end{figure}
+		\begin{figure}[ht]
+			\centering
+			\includegraphics[width=\textwidth]{rec/Regler.pdf}
+			\caption{Reglung Bahngeschwindigkeit}
+			\label{fig:Tcontrol}
 		\end{figure}
 		Die Regelung für die Bahngeschwindigkeit ist als Kaskadenregelung (Abbildung \ref{img:Regelung}) ausgeführt.
 		Dem Führungsregler wird eine konstante Sollzeit für Streckenabschnitt 3 vorgegeben. Dieser gibt nun, im Automatikmodus, die Sollspannung für den Folgeregler vor.
@@ -568,5 +575,10 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 		\label{tab:AnhangBelegungArduino}
 	\end{table}
 
+	\clearpage
+	\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/1.pdf}
+	\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/2.pdf}
+	\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/3.pdf}
+	\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/4.pdf}
 
 \end{document}
