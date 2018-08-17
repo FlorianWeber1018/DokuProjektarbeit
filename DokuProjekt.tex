@@ -109,7 +109,7 @@ Die oben genannten Probleme sollen im Rahmen der Projektarbeit durch ein neues S
 		\end{figure}
 		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus drei Wechseltaster mit Mittelstellung, sowie einem Wechselschalter mit Mittelstellung.
 
-		Der Wechselschalter (\glqq Wechselschalter 0\grqq{} für Bahn A und \glqq Wechselschalter 1\grqq{} für Bahn B ) ist zum Auswählen der Energieversorgung der jeweiligen Bahn. In der oberen Stellung wird die Bahn mit Netzenergie versorgt, in der unteren Stellung mit Solarenergie. 
+		Der Wechselschalter (\glqq Wechselschalter 0\grqq{} für Bahn A und \glqq Wechselschalter 1\grqq{} für Bahn B ) ist zum Auswählen der Energieversorgung der jeweiligen Bahn. In der oberen Stellung wird die Bahn mit Netzenergie versorgt, in der unteren Stellung mit Solarenergie.
 Ist einer dieser Wechselschalter in Mittelstellung, wird die Bahn nicht versorgt und das entsprechende Auto steht, unabhängig des gewählten Modus.\\
 		Über die Wechseltaster 0 beziehungsweise Wechseltaster 2 lässt sich der Modus der zugehörigen Bahn auswählen. Dies erfolgt indem einer der Taster oben beziehungsweise unten betätigt wird.  Der aktuell ausgewählte Modus wird durch die LEDs über beziehungsweise unter den Tastern signalisiert. Das LED oben signalisiert dabei den manuellen Modus, indem das Auto durch den Handregler gesteuert wird und ein LED unten, den Modus indem das Auto selbstständig fährt.\\
 Mit Wechseltaster 1  lassen sich die Integratoren der Regler, der Bahngeschwindigkeit (Abbildung \ref{fig:Tcontrol}), welche ausschließlich im automatisierten Modus aktiv sind, auf ihren Startwert zurücksetzten. Dabei setzt ein oberer Tastendruck den Regler von Bahn A und ein unterer den Regler von Bahn B zurück. Diese Regler sind genauer in Abschnitt \ref{subsec:control} beschrieben.
@@ -233,7 +233,7 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
 			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Sensor 0 ist nach Tabelle \ref{tab:belegungpcint} an PCINT16 angeschlossen. Aus dem Datenblatt des Mikrocontrollers (ATmega2560) geht hervor, dass für die Pin Chage Interrupts, drei Interruptvektoren vorgesehen sind. Dabei besteht eine Zuordnung von jeweils immer 8 PCINT Pins an einen Interruptvektor. Diese Zuordnung beginnt bei dem Pin PCINT0 und PCINT0\underline{}vect. Durch das Überfahren des Autos über den Sensor, wird also das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der Interrupt Service Routine (ISR) muss nun unterschieden werden, durch welchen Pin, das Interrupt ausgelöst wurde.
 			Die Lösung dieses Problems ist gegeben, indem der Signalpegel der PCINT Pins in der letzten ISR gesichert wurden. Nun wird das aktuelle Eingangsbyte des Ports mit dem zuvor gespeicherten bitweise exklusiv-oder verknüpft.
-Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt von dem ersten zugeordneten Pin des Interruptvektors. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat. 
+Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt von dem ersten zugeordneten Pin des Interruptvektors. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat.
 In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werden:
 				\begin{itemize}
 					\item \emph{High$\rightarrow$Low} Übergang
@@ -245,6 +245,7 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 			Das Entprellen des Eingangs ist implementiert, indem nach dem Auslösen eines Events, die PCINT Funktion für den zugehörigen Pin deaktiviert wird, sodass dieser das Interrupt nicht mehr auslösen kann. Zusätzlich wird ein Softwaretimer gestartet, der die PCINT Funktion des Pins, nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Überfahren des Sensors, das dementsprechende Event nur einmal triggert.
 			Analog zu dem Sensor 0, ist dies für jeden Sensor sowie Taster implementiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
 			\begin{table}[ht]
+				\caption{Belegung der Pin Change Interrupts}
 				\begin{tabular}{|l|l|l|}
 					\hline
 					Zugehörigkeit & Signal & Bezeichnung\\
@@ -279,7 +280,7 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 											& PCINT23 & Button: A-Manuell\\
 					\hline
 				\end{tabular}
-				\caption{Belegung der Pin Change Interrupts}
+
 				\label{tab:belegungpcint}
 			\end{table}
 			\subsubsection{Analog Digital Converter Interrupt}\label{subsubsec:ADCINT}
@@ -288,19 +289,29 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 			%erklärung an diesem
 	\subsection{Regler}\label{subsec:control}
 		\subsubsection{Bahnspannung}
-		\begin{figure}[ht]
-			\centering
-			\includegraphics[width=\textwidth]{rec/URegler.pdf}
-			\caption{Regelkreis Bahnspannung}
-			\label{fig:Ucontrol}
-		\end{figure}
+			\begin{figure}[ht]
+				\centering
+				\includegraphics[width=\textwidth]{rec/URegler.pdf}
+				\caption[Regelkreis Bahnspannung]{Regelkreis Bahnspannung.\\Die Sollspannung wird je nach aktiven Modus der Bahn vorgegeben.
+				Die Ist-Spannung der jeweiligen Bahn wird mit dem ADC gemessen und die Regelabweichung errechnet.
+				Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Spannung} verstärkt und auf den I-Regler gegeben.
+				Dieser erzeugt Den Dutycycle der auf den TSS gegeben wird.
+				TSS erzeugt Bahnspannung.}
+				\label{fig:Ucontrol}
+			\end{figure}
+			in 
 		\subsubsection{Bahngeschwindigkeit}
-		\begin{figure}[ht]
-			\centering
-			\includegraphics[width=\textwidth]{rec/TRegler.pdf}
-			\caption{Regelkreis Bahngeschwindigkeit}
-			\label{fig:Tcontrol}
-		\end{figure}
+			\begin{figure}[ht]
+				\centering
+				\includegraphics[width=\textwidth]{rec/TRegler.pdf}
+				\caption[Regelkreis Bahngeschwindigkeit]{Regelkreis Bahngeschwindigkeit.\\
+				Die Sollzeit ist als konstanter Parameter vorgegeben.
+				Die Zeit in Streckenabschnitt 3 (zwischen dem Ende des Loopings und der Startlinie) wird mit einem Softwaretimer gemessen und mit der Sollzeit verglichen.
+				Die resultierende Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Automatik} verstärkt und auf den I-Regler gegeben.
+				Dieser erzeugt daraus die Sollspannung für die jeweilige Bahn und gibt diese an den inneren Regelkreis (Regelkreis Spannung, Abbildung \ref{fig:Ucontrol}) weiter.
+				Dieser geneneriert daraus die Ist-Spannung die am Auto anliegt. Daraus ergibt sich eine neue Zeit für den Streckenabschnitt 3.}
+				\label{fig:Tcontrol}
+			\end{figure}
 		\FloatBarrier
 	\newpage
 	\subsection{Analog Digital Wandler}\label{subsec:ADC}
@@ -350,7 +361,7 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 
 
 \chapter{Bekannte Störungen}\label {cha:err}
-Gelegentlich fallen Autos im Looping herunter. 
+Gelegentlich fallen Autos im Looping herunter.
 Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrera Bahn.
 Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfläche versenkt und der Übergang zwischen den zusammengesteckten Streckenstücken weist einen unstetigen Verlauf auf. Dadurch ergibt sich eine Diskontinuität des Stroms, durch den Antrieb des Fahrzeugs im Looping. Dies führt zu Geschwindigkeitsverlust , sowie letztendlich zum Absturz des Fahrzeugs. Werden nun, um die schlechte mechanische Beschaffenheit auszugleichen,  die Strombürsten des Fahrzeugs weiter in Richtung Schiene gebogen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nicht mehr verlässlich.
 
@@ -396,7 +407,7 @@ Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abb
 Nun muss der Nutzer warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne LED auf dem RaspberryPi nicht mehr blinkt und der Bildschirm in den Standby-Modus schaltet.
 \chapter{Reflexion}
 
-Die zu Beginn, in Abschnitt \ref{sec:ziel} definierten Probleme der vorhandenen Carrera Bahn, sind durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle beseitigt.\\ 
+Die zu Beginn, in Abschnitt \ref{sec:ziel} definierten Probleme der vorhandenen Carrera Bahn, sind durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle beseitigt.\\
 Da nun unabhängig der gewählten Energiequelle, die Bahnspannung immer durch die Tiefsetzsteller erzeugt und geregelt wird, ist diese nicht mehr von der eigentlichen Quelle abhängig.
 Somit stellt nun auch die Solarenergieversorgung eine stabilisierte Spannungsquelle dar (siehe Abschnitt \ref{}).\\%SPANNUNGSREGLER REFERENZ EINBAUEN
 Der Temperaturdrift, des in der vorherigen Bahn eingesetzten variablen Widerstands, ist behoben, da dieser in der neuen Anlage, durch die Möglichkeit die Bahnspannung durch den Dutycycle der Tiefsetzsteller anzupassen, nicht mehr benötigt wird.\\
@@ -407,7 +418,7 @@ Ein bestehendes Problem der Carrera Bahn ist, das gelegentlich ein Auto im Loopi
 
 Insgesamt wird die Projektarbeit vom Autor als Erfolg angesehen.
 \chapter{Quellenverzeichnis}
-Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net. 
+Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 \\Von Mikrocontroller.net: \href{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}
 {\url{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}} abgerufen \label{src:scout1}
 \chapter{Anhang}
