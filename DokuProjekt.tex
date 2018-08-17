@@ -46,7 +46,7 @@ Die Solarstromversorgung wird pro Bahn durch 2 Solarpanels und einem Tiefsetzste
 
 Die manuelle Steuerung der Fahrzeuge durch den Nutzer ist realisiert, indem die klassischen Carrera Handregler, als variablen Vorwiderstand zu den Fahrzeugen eingesetzt werden. Im automatisierten Modus ist es möglich, mit je einem 5W Potentiometer die Geschwindigkeit des langsamen Streckenabschnittes einzustellen. In dem schnellen Steckenabschnitt (dem Looping) überbrückt ein Relais diesen Potentiometer und es liegt die volle Betriebsspannung, der jeweiligen Energieversorgung am Auto an.
 \newpage
-\section{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}
+\section{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}\label{sec:ziel}
 Der zuvor erwähnte Aufbau der vorhandenen Anlage vor der Projektarbeit weist einige Probleme auf:
 \begin{itemize}
 	\item{1.} Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt. (Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung eine unstabilisierte Quelle.)
@@ -107,13 +107,13 @@ Die oben genannten Probleme sollen im Rahmen der Projektarbeit durch ein neues S
 
 			\label{img:hid}
 		\end{figure}
-		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus 3 Wechseltaster mit Mittelstellung sowie einem Wechselschalter mit Mittelstellung.
+		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus drei Wechseltaster mit Mittelstellung, sowie einem Wechselschalter mit Mittelstellung.
 
-		Der Wechselschalter (\glqq Wechselschalter 0\grqq für Bahn A und \glqq Wechselschalter 1\grqq für Bahn B ) ist zum Auswählen der Energieversorgung der jeweiligen Bahn. In der oberen Stellung wird die Bahn mit Netzenergie versorgt, in der unteren Stellung mit Solarenergie. 
+		Der Wechselschalter (\glqq Wechselschalter 0\grqq{} für Bahn A und \glqq Wechselschalter 1\grqq{} für Bahn B ) ist zum Auswählen der Energieversorgung der jeweiligen Bahn. In der oberen Stellung wird die Bahn mit Netzenergie versorgt, in der unteren Stellung mit Solarenergie. 
 Ist einer dieser Wechselschalter in Mittelstellung, wird die Bahn nicht versorgt und das entsprechende Auto steht, unabhängig des gewählten Modus.\\
-		Über die Wechseltaster 0 beziehungsweise Wechseltaster 2 lässt sich der Modus der zugehörigen Bahn auswählen. Dies erfolgt indem einer der Taster oben bzw unten betätigt wird.  Der aktuell ausgewählte Modus wird durch die LEDs über bzw unter den Tastern signalisiert. Das LED oben signalisiert dabei den Manuellen Modus, indem das Auto durch den Handregler  gesteuert wird und ein LED unten, den Modus indem das Auto selbstständig in fährt.\\
-Mit Wechseltaster 1  lassen sich die Integratoren der Regler der Bahngeschwindigkeit (Abbildung \ref{fig:Tcontrol}), welche ausschließlich im automatisierten Modus aktiv sind, auf ihren Startwert zurücksetzten. Dabei setzt ein oberer Tastendruck den Regler von Bahn A und ein unterer den Regler von Bahn B zurück. Diese Regler sind genauer in Abschnitt \ref{subsec:control} beschrieben.
-Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen. Dieser ist in Abblidung \ref{img:hmi} mit \glqq Reset Visualisierung \grqq beschriftet und befindet sich zwischen den zwei Tiefsetzstellern oben links.
+		Über die Wechseltaster 0 beziehungsweise Wechseltaster 2 lässt sich der Modus der zugehörigen Bahn auswählen. Dies erfolgt indem einer der Taster oben beziehungsweise unten betätigt wird.  Der aktuell ausgewählte Modus wird durch die LEDs über beziehungsweise unter den Tastern signalisiert. Das LED oben signalisiert dabei den manuellen Modus, indem das Auto durch den Handregler gesteuert wird und ein LED unten, den Modus indem das Auto selbstständig fährt.\\
+Mit Wechseltaster 1  lassen sich die Integratoren der Regler, der Bahngeschwindigkeit (Abbildung \ref{fig:Tcontrol}), welche ausschließlich im automatisierten Modus aktiv sind, auf ihren Startwert zurücksetzten. Dabei setzt ein oberer Tastendruck den Regler von Bahn A und ein unterer den Regler von Bahn B zurück. Diese Regler sind genauer in Abschnitt \ref{subsec:control} beschrieben.
+Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessung) zurückzusetzen. Dieser ist in Abblidung \ref{img:hid} mit \glqq Reset Visualisierung\grqq{} beschriftet und befindet sich zwischen den zwei Tiefsetzstellern oben links.
 	\section{Arduino}
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
 		Dieser ist mit einem ATmega2560 der Firma Microchip bestückt.
@@ -126,7 +126,7 @@ Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessu
 		Letzteres lässt sich sehr gut für das Debugging nutzen.
 
 	\section{RaspberryPi}
-		Die Visualisierung ist durch ein RaspberryPi Model 3 B+ realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung \grqq (siehe Abbildung \ref{img:hid}).
+		Die Visualisierung ist durch ein RaspberryPi Model 3 B+ realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung\grqq{} (siehe Abbildung \ref{img:hid}).
 		Die Visualisierung ist zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\section{Tiefsetzsteller}
 		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Schienen (innerer Regelkreis der Kaskadenregelung).
@@ -141,17 +141,17 @@ Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessu
 		verarbeitet und ist lediglich für weiterführende Projekte gedacht.
 
 \chapter{Software}
-	\section{RaspberryPi}
+	\section{RaspberryPi}\label{sec:SoftPi}
 
 		Bei der Software, die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
 		Das Script bekommt die Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung \grqq, über die serielle Schnittstelle \glqq ttyAMA0 \grqq, gesendet und führt eine Rundenzeitmessung je Bahn durch.
 		Diese Zeitmessung wird auf dem Bildschirm angezeigt.
-		Zum Rendern der schrften sowie dem Hintergrundbild, ist die Open Source Bibliothek \glqq PyGame\grqq in Verwendung.
+		Zum Rendern der schrften sowie dem Hintergrundbild, ist die Open Source Bibliothek \glqq PyGame\grqq{} in Verwendung.
 		Das Bild ist separiert in einen Hintergrund und einem Block der den dynamischen Inhalt der Rundenzeitmessung enthält.
 		Um die Framerate entgegen der Version aus einer vorherigen Arbeit zu steigern, wird lediglich der dynamische Inhalt framweise neu gerendert.
 	\section{Arduino}
 		Die Software des Arduinos ist nicht in der Arduino Entwicklungsumgebung geschrieben, da dies einen direkten Zugriff auf die Hardware erschwert und der Programmablauf bereits vorgegeben wäre.
-		Stattdessen ist die Software in der integrierten Entwicklungsumgebung (IDE) \glqq Atmelstudio 7.0 \grqq entwickelt.
+		Stattdessen ist die Software in der integrierten Entwicklungsumgebung (IDE) \glqq Atmelstudio 7.0\grqq{} entwickelt.
 		Der Bootloader des Arduino wurde dazu entfernt.
 		Dies ermöglicht nun einen direkten Zugriff auf die Prozessorregister und damit Konfiguration der einzelnen Komponenten des Mikrocontrollers, auf dem Arduino.
 		Dies ist notwendig, um das Timing des Controllers exakt zu steuern und ist effizienter als für alle Hardwarekomponenten eine Bibliothek zu nutzen , wie es die Arduino Entwicklungsumgebung vorsehen würde.
@@ -287,29 +287,22 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 
 			%erklärung an diesem
 	\subsection{Regler}\label{subsec:control}
+		\subsubsection{Bahnspannung}
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=\textwidth]{rec/Regler.pdf}
-			\caption{Spannungsregelung Bahn}
+			\includegraphics[width=\textwidth]{rec/URegler.png}
+			\caption{Regelkreis Bahnspannung}
 			\label{fig:Ucontrol}
 		\end{figure}
+		\subsubsection{Bahngeschwindigkeit}
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=\textwidth]{rec/Regler.pdf}
-			\caption{Reglung Bahngeschwindigkeit}
+			\includegraphics[width=\textwidth]{rec/TRegler.png}
+			\caption{Regelkreis Bahngeschwindigkeit}
 			\label{fig:Tcontrol}
 		\end{figure}
-		Die Regelung für die Bahngeschwindigkeit ist als Kaskadenregelung (Abbildung \ref{img:Regelung}) ausgeführt.
-		Dem Führungsregler wird eine konstante Sollzeit für Streckenabschnitt 3 vorgegeben. Dieser gibt nun, im Automatikmodus, die Sollspannung für den Folgeregler vor.
-		Im manuellen Modus entspricht die Sollspannung einer skalierten Größe des jeweiligen Handreglers.
-		Der Folgeregler hat als Stellgröße den Duty-Cycle des zugehörigen Tiefsetzstellers und regelt die Spannung auf der Schiene auf den gegebenen Wert.
-		Der Regelalgorithmus des Spannungsreglers wird in festen Zeitabständen, vorgegeben durch OCR3 (Overflow Compare Register Timer3), zyklisch aufgerufen.
-		Der Regelalgorithmus des Reglers der Bahngeschwindigkeit wird immer dann aufgerufen, wenn ein neuer Zeitwert für den Streckenabschnitt 3 vorliegt.
-		Dieses Vorgehen ist durch die geringe Abtastrate des Führungsregles sehr störanfällig (Zum Beispiel wenn man das Auto in Streckenabschnitt 3 festgehalten wird), allerdings ist es die einzige Möglichkeit, einen solche Regelung mit den vorhandenen Sensoren zu realisieren. Die Bedingung für eine Kaskadenregelung (inner Regelkreis mindestens 10mal schneller als der Äußere) ist sicher eingehalten.\\
-		Der Vorfaktor des Führungsreglers ist eher verhältnismäßig klein gewählt, um ein Überschwingen möglichst zu Verhindern, da dies bedeuten würde, dass das Auto die Strecke verlässt.
-		Die gerade beschriebene Regelstrategie ist als solche nur im Automatik-Modus aktiv.\\
-		Im manuellen Modus wird die Sollspannung direkt durch den Handregler vorgegeben.
-		\newpage
+		\FloatBarrier
+	\newpage
 	\subsection{Analog Digital Wandler}\label{subsec:ADC}
 
 		Der Mikrocontroller des Arduinos (Atmega2560) hat bereits einen 10-bit Analog Digital Converter (ADC) auf dem Chip integriert, sodass auf einen externen Wandler, verzichtet wird.
@@ -356,15 +349,20 @@ Die PWM Generierung ist durch den Mikrocontroller in Hardware implementiert und 
 Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildung  \ref{fig:PWMGENAut} als Zustandsautomat dargestellt.
 
 
+\chapter{Bekannte Störungen}\label {cha:err}
+Gelegentlich fallen Autos im Looping herunter. 
+Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrera Bahn.
+Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfläche versenkt und der Übergang zwischen den zusammengesteckten Streckenstücken weist einen unstetigen Verlauf auf. Dadurch ergibt sich eine Diskontinuität des Stroms, durch den Antrieb des Fahrzeugs im Looping. Dies führt zu Geschwindigkeitsverlust , sowie letztendlich zum Absturz des Fahrzeugs. Werden nun, um die schlechte mechanische Beschaffenheit auszugleichen,  die Strombürsten des Fahrzeugs weiter in Richtung Schiene gebogen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nicht mehr verlässlich.
 
 \chapter{Bedienungsanleitung}
+%evt bild von visu
 \section{Einschalten}
 	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist die Carrera Bahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
 \section{Betrieb}
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.png}
-		\caption[Zustandsautomat zum Wechsel der Betriebsmodi]{Zustandsautomat zum Wechsel der Betriebsmodi.\\Durch den \glqq HMI Taster Auto \grqq der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell \grqq, die Bahn in den Handbetrieb versetzten und das entsprechende Auto mit dem Handregler manuell steuern.}
+		\caption[Zustandsautomat zum Wechsel der Betriebsmodi]{Zustandsautomat zum Wechsel der Betriebsmodi.\\Durch den \glqq HMI Taster Auto\grqq{} der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq{} Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand{} (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell\grqq{}, die Bahn in den Handbetrieb versetzten und das entsprechende Auto mit dem Handregler manuell steuern.}
 		\label{img:Betriebsmodi}
 	\end{figure}
 	Die Carrera Bahn beherrscht 2 Modi.
@@ -379,34 +377,35 @@ Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildu
 		werden.
 \newpage
 	\subsection{Automatisiertes Fahren}
-		Der Automatisierte Modus ist aufgeschlüsselt in zwei Zustände:
+		Der automatisierte Modus ist aufgeschlüsselt in zwei Zustände:
 		\begin{itemize}
 			\item Auto-Wait
 			\item Auto-Run
 		\end{itemize}
 		\subsubsection{Auto-Wait}
-		Immer wenn in den Modus des Automatisierten Fahrens gewechselt wird, startet die Steuerung in
+		Immer wenn in den Modus des automatisierten Fahrens gewechselt wird, startet die Steuerung in
 		Auto-Wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers, wechselt das Auto in den Auto-Run Zustand.
 		\subsubsection{Auto-Run}
-			Im Auto-run Zustand fährt das Auto selbständig. Durch die Regelung der mittleren Geschwindigkeit des langsamen Streckenabschnitts, braucht das Auto einige Runden um die optimale Spannung, für diese Geschwindigkeit zu finden.
+			Im Auto-Run Zustand fährt das Auto selbständig. Durch die Regelung der mittleren Geschwindigkeit des langsamen Streckenabschnitts, braucht das Auto einige Runden um die optimale Spannung, für diese Geschwindigkeit zu finden.
 
 			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping in Streckenabschnitt 1 zusammengefasst.
 			Der Rest einer Runde (vor dem Looping bis zur Startlinie) bildet Streckenabschnitt 2.
 \section{Ausschalten}
-Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens 5 Sekunden gedrückt zu halten.
-Nun muss man warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne Led auf dem RaspberryPi nichtmehr blinkt und der Bildschirm in den Standby-Modus schaltet.
-\chapter{Zusammenfassung}
-Die Zu Beginn definierten Ziele der Projektarbeit wurden durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle erreicht. Lediglich die Robustheit der Anlage ist ist nicht vollsändig gegeben, da gelegentlich ein Auto im Looping herunterfällt.
-Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Automatisierung und Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrera Bahn.
-Man hat herausgefunden dass im Looping die Stromschiene auf der Bahn, ein wenig in der Oberfläche versenkt ist und der Übergang zwischen den zusammengesteckten Streckenstücken einen unstetigen Verlauf hat. Dadurch ergibt sich eine Diskontinuität des Stroms durch den Antrieb des Fahrzeugs im Looping, was zu Geschwindigkeitsverlust, sowie letztendlich zum Absturz des Fahrzeugs führt. Biegt man nun die Strombürsten des Fahrzeugs weiter in Richtung Schiene um die schlechte Mechanische Beschaffenheit auszugleichen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nichtmehr verlässlich.
-Ein weitere Randbedingung für die Realisierung war dass die Automatisierung unabhängig von der länge der Strecke funktionieren sollte.
-Aufgrund dieser Forderung musste die Funktionalität, das Auto auf der Geraden zu beschleunigen verworfen werden, da dies nun nichtmehr in Abhängigkeit einer konstante Zeit realisiert werden kann. Als weiterführende Verbesserung könnte man zusätzliche Sensoren vor der Kurve zum abremsen einbauen.
-Ein weiteren Vorschlag zur Weiterarbeit wäre die Energieversorgung des RaspberryPi, sowie des Arduino auch autark über die Solarpanels zu ermöglichen.
+Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens fünf Sekunden gedrückt zu halten.
+Nun muss der Nutzer warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne LED auf dem RaspberryPi nicht mehr blinkt und der Bildschirm in den Standby-Modus schaltet.
+\chapter{Reflexion}
 
+Die zu Beginn, in Abschnitt \ref{sec:ziel} definierten Probleme der vorhandenen Carrera Bahn, sind durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle beseitigt.\\ 
+Da nun unabhängig der gewählten Energiequelle, die Bahnspannung immer durch die Tiefsetzsteller erzeugt und geregelt wird, ist diese nicht mehr von der eigentlichen Quelle abhängig.
+Somit stellt nun auch die Solarenergieversorgung eine stabilisierte Spannungsquelle dar (siehe Abschnitt \ref{}).\\%SPANNUNGSREGLER REFERENZ EINBAUEN
+Der Temperaturdrift, des in der vorherigen Bahn eingesetzten variablen Widerstands, ist behoben, da dieser in der neuen Anlage, durch die Möglichkeit die Bahnspannung durch den Dutycycle der Tiefsetzsteller anzupassen, nicht mehr benötigt wird.\\
+Die Framerate der Visualisierung wurde angehoben, indem immer nur der dynamische Bildinhalt (die Rundenzeiten) neu gerendert wird (siehe Abschnitt \ref{sec:SoftPi}). Dies reduziert die Rechenzeit pro Frame.\\
+Die Probleme mit Aliasing beim Auslesen der Sensoren sind durch den Einsatz der \glqq Pin Change Interrupts\grqq{} des Arduinos zum Digitalisieren der Sensorsignale vollständig behoben (siehe Abschnitt \ref{subsubsec:PCINT}).\\
 
+Ein bestehendes Problem der Carrera Bahn ist, das gelegentlich ein Auto im Looping herunterfällt, wenn dieses automatisch fährt. Die Ursache dessen wurde identifiziert (siehe Abschnitt \ref{cha:err}), kann allerdings nicht mit vertretbarem Aufwand gelöst werden.
 
-
+Insgesamt wird die Projektarbeit vom Autor als Erfolg angesehen.
 \chapter{Quellenverzeichnis}
 Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net. 
 \\Von Mikrocontroller.net: \href{https://www.mikrocontroller.net/articles/Datei:Interrupt_Programme.gif}
