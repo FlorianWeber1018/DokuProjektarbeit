@@ -290,14 +290,14 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 		\subsubsection{Bahnspannung}
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=\textwidth]{rec/URegler.png}
+			\includegraphics[width=\textwidth]{rec/URegler.pdf}
 			\caption{Regelkreis Bahnspannung}
 			\label{fig:Ucontrol}
 		\end{figure}
 		\subsubsection{Bahngeschwindigkeit}
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=\textwidth]{rec/TRegler.png}
+			\includegraphics[width=\textwidth]{rec/TRegler.pdf}
 			\caption{Regelkreis Bahngeschwindigkeit}
 			\label{fig:Tcontrol}
 		\end{figure}
@@ -319,7 +319,7 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=0.3\textwidth]{rec/ADCAutomat.png}
+			\includegraphics[width=0.3\textwidth]{rec/ADCAutomat.pdf}
 			\caption[Zustandsautomat des MUX im ADC]{Zustandsautomat des MUX im ADC.\\Die Zustände(S0 bis S1) beschreiben, welcher ADC Pin des Mikrocontrollers gerade durch den MUX mit dem ADC verbunden ist. Die Transitionsbedingung (links) beschreibt das Ereignis, mit dem man von einem Zustand in den Nächsten wechselt. Ein Punkt markiert den Schritt in den Initialzustand (S0) des Automats und ein Pfeil einen Sprung zu einem darunter definierten Zustand.}
 			\label{img:ADCMUX}
 		\end{figure}
@@ -331,11 +331,11 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 	\centering
 	\subcaptionbox{Zustandsautomat PWM Generierung
         \label{fig:PWMGENAut}}
-        {\includegraphics[width=0.34\textwidth]{rec/zustandsautomatPWM.png}}
+        {\includegraphics[width=0.34\textwidth]{rec/zustandsautomatPWM.pdf}}
         \hfill
   \subcaptionbox{Ausgang PWM Pin als Funktion des Zählerstands
         \label{fig:PWMGENFX}}
-        {\includegraphics[width=0.64\textwidth]{rec/graphPWM.png}}
+        {\includegraphics[width=0.64\textwidth]{rec/graphPWM.pdf}}
     \caption{Zustandsautomat des Timers zur PWM Generierung, sowie resultierendes Ausgangssignal bei konstantem Dutycycle.}
 
 
@@ -361,7 +361,7 @@ Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfl
 \section{Betrieb}
 	\begin{figure}[ht]
 		\centering
-		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.png}
+		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.pdf}
 		\caption[Zustandsautomat zum Wechsel der Betriebsmodi]{Zustandsautomat zum Wechsel der Betriebsmodi.\\Durch den \glqq HMI Taster Auto\grqq{} der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq{} Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand{} (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell\grqq{}, die Bahn in den Handbetrieb versetzten und das entsprechende Auto mit dem Handregler manuell steuern.}
 		\label{img:Betriebsmodi}
 	\end{figure}
