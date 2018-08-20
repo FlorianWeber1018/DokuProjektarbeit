@@ -72,20 +72,31 @@ Die oben genannten Probleme sollen im Rahmen der Projektarbeit durch ein neues S
 	Auf Abschnitt 1 und Abschnitt 3 wird im automatisierten Modus die mittlere Geschwindigkeit des Autos geregelt.
 	Im Looping (Streckenbschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
 	Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
+Wie in Abbildung \ref{img:energiefluss} zu sehen ist, ist der Tiefsetzsteller (TSS) immer zwischen die Energiequelle und das Auto geschaltet. Somit ist es möglich die Bahnspannung zu steuern. 
+	\begin{figure}[ht]
+		\centering
+		\includegraphics[width=0.85\textwidth]{rec/energiefluss.pdf}
+		\caption[Energiefluss einer Bahn]{Energiefluss einer Bahn.\\Durch einen Wechselschalter, kann der Nutzer zwischen den zwei Energieversorgungen 
+			Photovoltaik (PV) und Netz wählen, oder die Versorgung komplett ausschalten. 
+			Der Tiefsetzsteller (TSS) ist dabei immer zwischen Energiequelle und dem Auto auf der Bahn geschaltet.}
+		\label{img:energiefluss}
+	\end{figure}
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
 		\caption[Signalflussbild der Steuerung]{Signalflussbild der Steuerung. \\Arduino liest Signale von Sensoren, sowie Tastern parallel aus und misst die Ausgangsspannung der Tiefsetzsteller (TSS) und Handregler. Auf Grundlage dieser Daten, generiert der Arduino die PWM Signale für die TSS und leitet die Sensordaten per Universal Asynchronous Receiver Transmitter (UART), an den RaspberryPi, zur Rundenzeitmessung weiter.}
 		\label{img:signalfluss}
 	\end{figure}
+	
 	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss der Carrera Bahn dargestellt.
 	Auf der Bahn stellt der Arduino das zentrale Element dar.
 	Dieser liest die Sensoren in den Schienen, sowie die Taster des Human Maschine Interfaces (HMI) parallel ein und gibt die Signale der LEDs, welche den aktuellen Zustand des jeweils aktiven Modus signalisieren, parallel aus.
-	Die analogen Größen (Ausgangsspannung Tiefsetzsteller (TSS), Spannung über Strommessshunt TSS, Ausgangsspannung Spannungsteiler Handregler) sind an den Analog-Digital-Wandler (ADC) des Arduinos angeschlossen.
-	Der Arduino generiert außerdem die zwei PWM-Signale, die von den Tiefsetzstellern benötigt werden, über einen 8-bit Hardwaretimer.
+	Die analogen Größen (Ausgangsspannung TSS, Spannung über Strommessshunt TSS, Ausgangsspannung Spannungsteiler Handregler) sind an den Analog-Digital-Wandler (ADC) des Arduinos angeschlossen.
+	Der Arduino generiert außerdem die zwei PWM Signale, die von den Tiefsetzstellern benötigt werden, über einen 8-bit Hardwaretimer.
 	Dies ist genauer in Abschnitt \ref{subsec:PWM} beschrieben.
 	Um eine Visualisierung zu realisieren ist ein RaspberryPi per Universal Asynchronous Receiver Transmitter (UART) seriell angebunden. Wie die anderen Kommunikationsverbindungen, ist auch diese Verbindung nur unidirektional ausgeführt.
 	Die genaue Implementierung der Schnittstellen ist in den jeweiligen Kapiteln genauer beschrieben.
+
 	\section{Sensoren}
 		Wie in Abbildung \ref{img:carrerakomplett} zu sehen ist, gibt es pro Bahn 3 Sensoren. Diese sind als Gabellichtschranken ausgeführt. Sensor 0 befindet sich am Start von Bahn A, Sensor 1 vor dem Looping und Sensor 2 nach dem Looping.\\
 
@@ -288,19 +299,28 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 
 			%erklärung an diesem
 	\subsection{Regler}\label{subsec:control}
-		\subsubsection{Bahnspannung}
+Die Carrera Bahn hat zwei verschiedene Regelkreise. 
+Der eine regelt die Bahnspannung (siehe Abschnitt \ref{subsubsec:Ucontrol}) und ist in jedem Modus (manuell oder automatisiert) aktiv. 
+Der andere Regelkreis (siehe Abschnitt \ref{subsubsec:Tcontrol}) ist lediglich im automatisierten Modus aktiv und regelt dort die Soll-Spannung auf den langsamen Streckenabschnitten (außerhalb des Loopings).
+Zusammen bilden die zwei Regelkreise im automatisierten Modus eine Kaskadenregelung.
+		\subsubsection{Bahnspannung}\label{subsubsec:Ucontrol}
 			\begin{figure}[ht]
 				\centering
 				\includegraphics[width=\textwidth]{rec/URegler.pdf}
-				\caption[Regelkreis Bahnspannung]{Regelkreis Bahnspannung.\\Die Sollspannung wird je nach aktiven Modus der Bahn vorgegeben.
+				\caption[Regelkreis Bahnspannung]{Regelkreis Bahnspannung.\\Die Soll-Spannung wird je nach aktiven Modus der Bahn vorgegeben.
 				Die Ist-Spannung der jeweiligen Bahn wird mit dem ADC gemessen und die Regelabweichung errechnet.
 				Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Spannung} verstärkt und auf den I-Regler gegeben.
 				Dieser erzeugt Den Dutycycle der auf den TSS gegeben wird.
 				TSS erzeugt Bahnspannung.}
 				\label{fig:Ucontrol}
 			\end{figure}
-			in 
-		\subsubsection{Bahngeschwindigkeit}
+			Um Schwankungen in der Energieversorgung auszugleichen, sowie das Steuern der Bahnspannung zu ermöglichen, 
+			ist eine Spannungsregelung nach Abbildung \ref{fig:Ucontrol} implementiert.
+			Die Ist-Spannung der jeweiligen Bahn wird zyklisch mittels des ADCs gemessen. Jedes mal wenn ein neuer Wert der Bahnspannung von Bahn-A vorliegt, wird die Funktion  \emph{i\_control\_voltage\_a}  aufgerufen. Die Funktion kann nun die Regeldifferenz \glqq e\grqq{} bilden und diese mit dem Faktor \glqq K\textsubscript{Spannung}\grqq{} verstärken.
+Der I-Regler (einfacher digitaler Integrator mit der Differenzengleichung $y[k]=y[k-1]+x[k]$) integriert diese verstärkte Regelabweichung auf und generiert damit den Dutycycle für den TSS, bei dem sich dann eine neue Ausgangsspannung (U\textsubscript{Bahn}) entsprechend des neuen Dutycycle einstellt. Diese neue Spannung wird wieder gemessen und die Funktion wird erneut aufgerufen.
+Als Regler ist ein digitaler I-Regler in Verwendung, da Die Strecke (TSS) kein freier Integrator besitzt. jedoch braucht ein Regelkreis mindestens ein freien Integrator um stationäre Genauigkeit aufzuweisen.
+Zusätzlich zu dem gerade eben beschriebenen Regelalgorithmus, ist die Ausgangsgröße des I-Reglers nach oben (maximal 200/255) sowie unten (minimal 10/255) begrenzt. Dies ist notwendig da der TSS jenseits eines Dutycycle von 200, bei einer weiteren Erhöhung, nicht mehr eine höhere Ausgangsspannung liefert und das Auto sich unter einem Dutycycle von 10 noch nicht bewegt. Diese Grenzen wurden empirisch ermittelt und beziehen sich auf die Quelle mit dem höchsten Innenwiderstand (PV).
+		\subsubsection{Bahngeschwindigkeit}\label{subsubsec:Tcontrol}
 			\begin{figure}[ht]
 				\centering
 				\includegraphics[width=\textwidth]{rec/TRegler.pdf}
@@ -308,7 +328,7 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 				Die Sollzeit ist als konstanter Parameter vorgegeben.
 				Die Zeit in Streckenabschnitt 3 (zwischen dem Ende des Loopings und der Startlinie) wird mit einem Softwaretimer gemessen und mit der Sollzeit verglichen.
 				Die resultierende Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Automatik} verstärkt und auf den I-Regler gegeben.
-				Dieser erzeugt daraus die Sollspannung für die jeweilige Bahn und gibt diese an den inneren Regelkreis (Regelkreis Spannung, Abbildung \ref{fig:Ucontrol}) weiter.
+				Dieser erzeugt daraus die Soll-Spannung für die jeweilige Bahn und gibt diese an den inneren Regelkreis (Regelkreis Spannung, Abbildung \ref{fig:Ucontrol}) weiter.
 				Dieser geneneriert daraus die Ist-Spannung die am Auto anliegt. Daraus ergibt sich eine neue Zeit für den Streckenabschnitt 3.}
 				\label{fig:Tcontrol}
 			\end{figure}
