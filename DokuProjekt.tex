@@ -140,24 +140,24 @@ Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessu
 		Die Visualisierung ist durch ein RaspberryPi Model 3 B+ realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung\grqq{} (siehe Abbildung \ref{img:hid}).
 		Die Visualisierung ist zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
 	\section{Tiefsetzsteller}
-		Die Tiefsetzsteller fungieren als Stellglieder der Spannungsregelungen der Schienen (innerer Regelkreis der Kaskadenregelung).
+		Die Tiefsetzsteller (TSS) fungieren als Stellglieder der Spannungsregelungen der Bahnen.
 		Dabei sind die Bahnen jeweils direkt an die Ausgänge der beiden TSS angeschlossen.
 	  Der Arduino generiert die zwei PWM Signal für die TSS.
-		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch die PWM Signale auf ihre aktuellen Sollwerte geregelt.
+		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch den in Abschnitt \ref{subsubsec:Ucontrol} auf ihre aktuellen Sollwerte geregelt.
 		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs %HIEEEEEER ZAHLENWERT EINTRAGEN EVT MESSEN !!!
 		nach oben hin begrenzt.
 		Da diese größer sein kann wie die Referenzspannung des ADC (interne Referenzspannung von 2.56V), wird sie über einen Spannungsteiler angepasst und kann damit auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt werden.
-		Desweiteren ist über ein Shunt eine Strommessung realisiert.
-		Der Wert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
+		Des Weiteren ist über ein Shunt eine Strommessung realisiert.
+		Dieser Stromwert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
 		verarbeitet und ist lediglich für weiterführende Projekte gedacht.
 
 \chapter{Software}
 	\section{RaspberryPi}\label{sec:SoftPi}
-
 		Bei der Software, die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
-		Das Script bekommt die Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung \grqq, über die serielle Schnittstelle \glqq ttyAMA0 \grqq, gesendet und führt eine Rundenzeitmessung je Bahn durch.
+		Das Script bekommt die Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung \grqq, über die serielle Schnittstelle \glqq ttyAMA0 \grqq, 
+		gesendet und führt eine Rundenzeitmessung je Bahn durch.
 		Diese Zeitmessung wird auf dem Bildschirm angezeigt.
-		Zum Rendern der schrften sowie dem Hintergrundbild, ist die Open Source Bibliothek \glqq PyGame\grqq{} in Verwendung.
+		Zum Rendern der Schriften sowie dem Hintergrundbild, ist die Open Source Bibliothek \glqq PyGame\grqq{} in Verwendung.
 		Das Bild ist separiert in einen Hintergrund und einem Block der den dynamischen Inhalt der Rundenzeitmessung enthält.
 		Um die Framerate entgegen der Version aus einer vorherigen Arbeit zu steigern, wird lediglich der dynamische Inhalt framweise neu gerendert.
 	\section{Arduino}
@@ -203,6 +203,7 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 			Dieser bezieht seinen Takt von dem  Hardwaretimer \glqq Timer4\grqq.
 			Die Verwendung der Hard- sowie Softwaretimer kann der Tabelle \ref{tab:belegungTimer} entnommen werden.
 				\begin{table}[ht]
+					\caption{Belegung der Hard- sowie Softwaretimer}
 					\begin{tabular}{|l|l|l|}
 						\hline
 						\textbf{Timer} & \textbf{Funktion}\\
@@ -238,13 +239,13 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 						17 & Trigger für Zeitmessung Resettaster Visualisierung (langer Tastendruck)\\
 						\hline
 					\end{tabular}
-					\caption{Belegung der Hard- sowie Softwaretimer}
+					
 					\label{tab:belegungTimer}
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
 			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Sensor 0 ist nach Tabelle \ref{tab:belegungpcint} an PCINT16 angeschlossen. Aus dem Datenblatt des Mikrocontrollers (ATmega2560) geht hervor, dass für die Pin Chage Interrupts, drei Interruptvektoren vorgesehen sind. Dabei besteht eine Zuordnung von jeweils immer 8 PCINT Pins an einen Interruptvektor. Diese Zuordnung beginnt bei dem Pin PCINT0 und PCINT0\underline{}vect. Durch das Überfahren des Autos über den Sensor, wird also das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der Interrupt Service Routine (ISR) muss nun unterschieden werden, durch welchen Pin, das Interrupt ausgelöst wurde.
 			Die Lösung dieses Problems ist gegeben, indem der Signalpegel der PCINT Pins in der letzten ISR gesichert wurden. Nun wird das aktuelle Eingangsbyte des Ports mit dem zuvor gespeicherten bitweise exklusiv-oder verknüpft.
-Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt von dem ersten zugeordneten Pin des Interruptvektors. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat.
+Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt, von dem ersten zugeordneten Interruptpin des Bytes. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat.
 In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werden:
 				\begin{itemize}
 					\item \emph{High$\rightarrow$Low} Übergang
@@ -306,7 +307,7 @@ Zusammen bilden die zwei Regelkreise im automatisierten Modus eine Kaskadenregel
 		\subsubsection{Bahnspannung}\label{subsubsec:Ucontrol}
 			\begin{figure}[ht]
 				\centering
-				\includegraphics[width=\textwidth]{rec/URegler.pdf}
+				\includegraphics[width=\textwidth]{rec/Ucontrol.pdf}
 				\caption[Regelkreis Bahnspannung]{Regelkreis Bahnspannung.\\Die Soll-Spannung wird je nach aktiven Modus der Bahn vorgegeben.
 				Die Ist-Spannung der jeweiligen Bahn wird mit dem ADC gemessen und die Regelabweichung errechnet.
 				Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Spannung} verstärkt und auf den I-Regler gegeben.
@@ -316,22 +317,38 @@ Zusammen bilden die zwei Regelkreise im automatisierten Modus eine Kaskadenregel
 			\end{figure}
 			Um Schwankungen in der Energieversorgung auszugleichen, sowie das Steuern der Bahnspannung zu ermöglichen, 
 			ist eine Spannungsregelung nach Abbildung \ref{fig:Ucontrol} implementiert.
-			Die Ist-Spannung der jeweiligen Bahn wird zyklisch mittels des ADCs gemessen. Jedes mal wenn ein neuer Wert der Bahnspannung von Bahn-A vorliegt, wird die Funktion  \emph{i\_control\_voltage\_a}  aufgerufen. Die Funktion kann nun die Regeldifferenz \glqq e\grqq{} bilden und diese mit dem Faktor \glqq K\textsubscript{Spannung}\grqq{} verstärken.
-Der I-Regler (einfacher digitaler Integrator mit der Differenzengleichung $y[k]=y[k-1]+x[k]$) integriert diese verstärkte Regelabweichung auf und generiert damit den Dutycycle für den TSS, bei dem sich dann eine neue Ausgangsspannung (U\textsubscript{Bahn}) entsprechend des neuen Dutycycle einstellt. Diese neue Spannung wird wieder gemessen und die Funktion wird erneut aufgerufen.
-Als Regler ist ein digitaler I-Regler in Verwendung, da Die Strecke (TSS) kein freier Integrator besitzt. jedoch braucht ein Regelkreis mindestens ein freien Integrator um stationäre Genauigkeit aufzuweisen.
-Zusätzlich zu dem gerade eben beschriebenen Regelalgorithmus, ist die Ausgangsgröße des I-Reglers nach oben (maximal 200/255) sowie unten (minimal 10/255) begrenzt. Dies ist notwendig da der TSS jenseits eines Dutycycle von 200, bei einer weiteren Erhöhung, nicht mehr eine höhere Ausgangsspannung liefert und das Auto sich unter einem Dutycycle von 10 noch nicht bewegt. Diese Grenzen wurden empirisch ermittelt und beziehen sich auf die Quelle mit dem höchsten Innenwiderstand (PV).
+			Die Ist-Spannung der jeweiligen Bahn wird zyklisch mittels des ADCs gemessen. Jedes mal wenn ein neuer Wert der Bahnspannung von Bahn-A vorliegt, 
+			wird die Funktion  \emph{i\_control\_voltage\_a} (siehe Quellcode)  aufgerufen. Die Funktion kann nun die Regeldifferenz \glqq e\grqq{} bilden und 
+			diese mit dem Faktor \glqq K\textsubscript{Spannung}\grqq{} verstärken.
+			Der I-Regler (einfacher digitaler Integrator mit der Differenzengleichung $y[k]=y[k-1]+x[k]$) integriert diese verstärkte Regelabweichung auf und 
+			generiert damit den Dutycycle für den TSS, bei dem sich dann eine neue Ausgangsspannung (U\textsubscript{Bahn}) entsprechend des neuen Dutycycle einstellt. 
+			Diese neue Spannung wird wieder gemessen und die Funktion wird erneut aufgerufen.
+			Als Regler ist ein digitaler I-Regler in Verwendung, da Die Strecke (TSS) kein freier Integrator besitzt. 
+			Jedoch braucht ein Regelkreis mindestens ein freien Integrator um stationäre Genauigkeit aufzuweisen.
+			Zusätzlich zu dem gerade eben beschriebenen Regelalgorithmus, ist die Ausgangsgröße des I-Reglers nach oben (maximal 200/255), 
+			sowie unten (minimal 10/255) begrenzt. Dies ist notwendig da der TSS jenseits eines Dutycycle von 200, bei einer weiteren Erhöhung, 
+			nicht mehr eine höhere Ausgangsspannung liefert und das Auto sich unter einem Dutycycle von 10 noch nicht bewegt. 
+			Diese Grenzen wurden empirisch ermittelt und beziehen sich auf die Quelle mit dem höchsten Innenwiderstand (PV).
 		\subsubsection{Bahngeschwindigkeit}\label{subsubsec:Tcontrol}
 			\begin{figure}[ht]
 				\centering
-				\includegraphics[width=\textwidth]{rec/TRegler.pdf}
+				\includegraphics[width=\textwidth]{rec/Tcontrol.pdf}
 				\caption[Regelkreis Bahngeschwindigkeit]{Regelkreis Bahngeschwindigkeit.\\
 				Die Sollzeit ist als konstanter Parameter vorgegeben.
 				Die Zeit in Streckenabschnitt 3 (zwischen dem Ende des Loopings und der Startlinie) wird mit einem Softwaretimer gemessen und mit der Sollzeit verglichen.
-				Die resultierende Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Automatik} verstärkt und auf den I-Regler gegeben.
+				Die resultierende Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Geschwindigkeit} verstärkt und auf den I-Regler gegeben.
 				Dieser erzeugt daraus die Soll-Spannung für die jeweilige Bahn und gibt diese an den inneren Regelkreis (Regelkreis Spannung, Abbildung \ref{fig:Ucontrol}) weiter.
 				Dieser geneneriert daraus die Ist-Spannung die am Auto anliegt. Daraus ergibt sich eine neue Zeit für den Streckenabschnitt 3.}
 				\label{fig:Tcontrol}
 			\end{figure}
+			Da die Carrera Bahn mit verschiedenen Fahrzeugen betrieben werden kann und somit die Modellparameter nicht konstant sind (zum Beispiel Reibungsverluste im Fahrzeug, allgemein Motor), ist es notwendig die Soll-Spannung im automatisierten Modus auf den langsamen Streckenabschnitten anzupassen. Hierzu ist ein Regler nach Abbildung \ref{fig:Tcontrol} implementiert. Dabei wird die Zeit gemessen, welche das Auto benötigt, um die Strecke zwischen dem Sensor nach dem Looping bis zum Sensor an der Startlinie zu fahren.
+Für diese Zeit ist im Arduino eine konstante Soll-Zeit hinterlegt. Jedes mal wenn ein neuer Messwert für die Zeit auf diesem Streckenabschnitt vorliegt, wird die Funktion 
+\emph{i\_control\_railspeed\_a}  (siehe Quellcode)  aufgerufen und darin die  Regeldifferenz \glqq e\grqq{} bilden. Analog zu dem Regelkreis in Abschnitt \ref{subsubsec:Ucontrol}, wird auch hier die Regeldifferenz gebildet und mit dem Faktor K\textsubscript{Geschwindigkeit} skaliert. Als Regler kommt ein I-Regler wie in Abschnitt \ref{subsubsec:Ucontrol} zum Einsatz. Die so erzeugte Stellgröße U\textsubscript{Soll} wird nun auf das Stellglied (innerer Regelkreis Bahnspannung aus Abschnitt \ref{subsubsec:Ucontrol}) gegeben und es ergibt sich durch eine neue Bahnspannung auch eine neue Zeit für den gemessenen Streckenabschnitt. In der nächsten Runde wiederholt sich der Kreis.\\
+Um Fehler die durch kurzzeitige externe Störungen verursacht werden abzufangen hat man die Änderung von U\textsubscript{Soll} begrenzt.
+Solche Störungen wären zum Beispiel wenn das Auto in dem Streckenabschnitt zwischen dem Looping und der Startlinie festgehalten wird oder herausfällt.
+Dies führt dazu, dass das Auto ein paar Runden mehr braucht, um seinen stationären Endwert in der Geschwindigkeit zu finden, allerdings macht es die Regelung insgesamt robuster.
+Der in diesem Abschnitt beschriebene Regelalgorithmus ist ausschließlich im automatisierten Modus einer Bahn aktiv.
+Durch ein Wechsel des Modus aus dem Modus Auto-Run (sie Abschnitt \ref{subsec:bedAuto}) in einen anderen Modus, bleibt der aktuelle Wert des Integrators erhalten, sodass das Auto beim nächsten mal, vorausgesetzt das Auto ist dasselbe, mit der richtigen Geschwindigkeit startet.
 		\FloatBarrier
 	\newpage
 	\subsection{Analog Digital Wandler}\label{subsec:ADC}
@@ -407,7 +424,7 @@ Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfl
 		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die originalen Carrera Handregler gesteuert
 		werden.
 \newpage
-	\subsection{Automatisiertes Fahren}
+	\subsection{Automatisiertes Fahren}\label{subsec:bedAuto}
 		Der automatisierte Modus ist aufgeschlüsselt in zwei Zustände:
 		\begin{itemize}
 			\item Auto-Wait
@@ -429,8 +446,8 @@ Nun muss der Nutzer warten bis der RaspberryPi komplett heruntergefahren ist. Di
 
 Die zu Beginn, in Abschnitt \ref{sec:ziel} definierten Probleme der vorhandenen Carrera Bahn, sind durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle beseitigt.\\
 Da nun unabhängig der gewählten Energiequelle, die Bahnspannung immer durch die Tiefsetzsteller erzeugt und geregelt wird, ist diese nicht mehr von der eigentlichen Quelle abhängig.
-Somit stellt nun auch die Solarenergieversorgung eine stabilisierte Spannungsquelle dar (siehe Abschnitt \ref{}).\\%SPANNUNGSREGLER REFERENZ EINBAUEN
-Der Temperaturdrift, des in der vorherigen Bahn eingesetzten variablen Widerstands, ist behoben, da dieser in der neuen Anlage, durch die Möglichkeit die Bahnspannung durch den Dutycycle der Tiefsetzsteller anzupassen, nicht mehr benötigt wird.\\
+Somit stellt nun auch die Solarenergieversorgung eine stabilisierte Spannungsquelle dar (siehe Abschnitt \ref{subsubsec:Ucontrol}).\\
+Der Temperaturdrift, des in der vorherigen Bahn eingesetzten variablen Widerstands, ist behoben, da dieser in der neuen Anlage, durch die Möglichkeit die Bahnspannung durch den Dutycycle der Tiefsetzsteller anzupassen, nicht mehr benötigt wird. (siehe Abbildung \ref{img:energiefluss})\\
 Die Framerate der Visualisierung wurde angehoben, indem immer nur der dynamische Bildinhalt (die Rundenzeiten) neu gerendert wird (siehe Abschnitt \ref{sec:SoftPi}). Dies reduziert die Rechenzeit pro Frame.\\
 Die Probleme mit Aliasing beim Auslesen der Sensoren sind durch den Einsatz der \glqq Pin Change Interrupts\grqq{} des Arduinos zum Digitalisieren der Sensorsignale vollständig behoben (siehe Abschnitt \ref{subsubsec:PCINT}).\\
 
@@ -446,6 +463,7 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 
 	\begin{table}[H]
 	\centering
+		\caption{Pinbelegung der Sub-D Buchse auf dem HMI}
 		\begin{tabular}{|l|l|}
 			\hline
 			\textbf{Sub-D Pin} &\textbf{Funktion}\\
@@ -482,12 +500,12 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 			15 & Schiene B - Minus\\
 			\hline
 		\end{tabular}
-		\caption{Pinbelegung der Sub-D Buchse auf dem HMI}
 		\label{tab:AnhangBelegungSUBD}
 	\end{table}
 
 	\begin{table}[H]
 	\centering
+		\caption{Pinbelegung GPIO RaspberryPi}
 		\begin{tabular}{|l|l|}
 			\hline
 			\textbf{Raspberry Pin} &\textbf{Funktion}\\
@@ -512,11 +530,12 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 			11$\rightarrow$40 & -\\
 			\hline
 		\end{tabular}
-		\caption{Pinbelegung GPIO RaspberryPi}
+		
 		\label{tab:AnhangBelegungRPI}
 	\end{table}
 
 	\begin{table}[hb]
+		\caption{Pinbelegung des Arduino}
 		\begin{tabular}{|l|l|l|}
 			\hline
 			\textbf{Arduino Pin} & \textbf{Atmel Pin} &\textbf{Funktion}\\
@@ -601,7 +620,7 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 			A15 & PCINT23 & Taster HID \glqq Schiene A - Manuell\grqq \\
 			\hline
 		\end{tabular}
-		\caption{Pinbelegung des Arduino}
+		
 		\label{tab:AnhangBelegungArduino}
 	\end{table}
 
