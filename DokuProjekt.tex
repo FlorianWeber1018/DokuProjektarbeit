@@ -128,14 +128,12 @@ Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessu
 	\section{Arduino}
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
 		Dieser ist mit einem ATmega2560 der Firma Microchip bestückt.
-		%warum wird ein arduino eingesetzt?
-		%debug funktion
-		%tacktung 16MHz
-		%5v Versorgungsspannung
-
-		Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, aber auch einen USB-Seriell Wandler, der genutzt wird, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
-		Letzteres lässt sich sehr gut für das Debugging nutzen.
-
+		Der ATmega2560 ist perfekt für die Anwendung geeignet, da er einen Analog-Digital-Wandler (ADC) zur Messung analoger Größen, Hardwaretimer mit PWM Funktionalität, sowie  vier UARTs zur Kommunikation besitzt.
+Der Arduino kommt zum Einsatz, da er die Pins des Mikrocontrollers auf Buchsenleisten führt. So ist es unter anderem möglich, ohne größeren Aufwand, Drähte an die Pads der Buchsenleisten anzulöten. Außerdem enthält ein Arduino bereits alle zum Betrieb notwendigen Bauteile für den Mikrocontroller.
+Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, oder der Glättungskondensator an der Referenzspannung des ADCs.
+Des Weiteren enthält der Arduino einen USB-Seriell Wandler, der genutzt werden kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
+Dies ist zum Beispiel sehr hilfreich, um das Programm zu debuggen, oder die Regelparameter einzustellen.
+Der Mikrocontroller ist mit 16MHz getaktet und wird direkt mit 5V aus dem Steckernetzteil des RaspberryPi versorgt.
 	\section{RaspberryPi}
 		Die Visualisierung ist durch ein RaspberryPi Model 3 B+ realisiert. Dieser empfängt per UART die codierten Signale der Sensoren, sowie des Tasters \glqq Reset Visualisierung\grqq{} (siehe Abbildung \ref{img:hid}).
 		Die Visualisierung ist zu Beginn der Projektarbeit bereits vorhanden und in Form eines Python Skripts implementiert.
@@ -144,7 +142,7 @@ Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessu
 		Dabei sind die Bahnen jeweils direkt an die Ausgänge der beiden TSS angeschlossen.
 	  Der Arduino generiert die zwei PWM Signal für die TSS.
 		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch den in Abschnitt \ref{subsubsec:Ucontrol} auf ihre aktuellen Sollwerte geregelt.
-		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs %HIEEEEEER ZAHLENWERT EINTRAGEN EVT MESSEN !!!
+		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs%HIEEEEEER ZAHLENWERT EINTRAGEN EVT MESSEN !!!
 		nach oben hin begrenzt.
 		Da diese größer sein kann wie die Referenzspannung des ADC (interne Referenzspannung von 2.56V), wird sie über einen Spannungsteiler angepasst und kann damit auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt werden.
 		Des Weiteren ist über ein Shunt eine Strommessung realisiert.
@@ -196,7 +194,6 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 				\end{itemize}
 
 			\end{itemize}
-%HIER WEITER
 			\subsubsection{Timer}\label{subsubsec:Timer}
 			Für die Funktion der Steuerung werden viele Timer benötigt.\\
 			Da im Mikrocontroller allerdings nur begrenzt Hardwaretimer zur Verfügung stehen, ist deren Funktionalität in einem Softwaretimer nachgebildet.
@@ -410,7 +407,7 @@ Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfl
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.pdf}
-		\caption[Zustandsautomat zum Wechsel der Betriebsmodi]{Zustandsautomat zum Wechsel der Betriebsmodi.\\Durch den \glqq HMI Taster Auto\grqq{} der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq{} Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand{} (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell\grqq{}, die Bahn in den Handbetrieb versetzten und das entsprechende Auto mit dem Handregler manuell steuern.}
+		\caption[Zustandsautomat zum Wechsel der Betriebsmodi einer Bahn]{Zustandsautomat zum Wechsel der Betriebsmodi einer Bahn.\\Durch den \glqq HMI Taster Auto\grqq{} der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq{} Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand{} (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell\grqq{}, die Bahn in den manuellen Modus versetzten und das entsprechende Auto mit dem Handregler konventionell steuern.}
 		\label{img:Betriebsmodi}
 	\end{figure}
 	Die Carrera Bahn beherrscht 2 Modi.
@@ -418,11 +415,13 @@ Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfl
 		\item Manuelles Fahren
 		\item Automatisiertes Fahren
 	\end{itemize}
-	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass es zum Beispiel möglich ist, manuell gegen ein automatisiertes Fahrzeug anzutreten. Die Wahl eines dementsprechenden Modus (automatisiert oder manuell), wird durch eine LED über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung jeder Bahn mit dem entsprechenden Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der 2 Abschnitte, sowie die Rundenzeit angezeigt. Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
+	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass es zum Beispiel möglich ist, manuell gegen ein automatisiertes Fahrzeug anzutreten. Die Wahl eines dementsprechenden Modus (automatisiert oder manuell), wird durch eine LED über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung jeder Bahn mit dem entsprechenden Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der zwei Streckenabschnitte, sowie die Rundenzeit angezeigt.
+In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping in Streckenabschnitt 1 zusammengefasst.
+			Der Rest einer Runde (vor dem Looping bis zur Startlinie) bildet Streckenabschnitt 2.
+Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
 	Der Wechsel zwischen den Modi findet nach Abbildung \ref{img:Betriebsmodi} statt und ist in den jeweiligen Abschnitten genauer erklärt.
 	\subsection{Manuelles Fahren}\label{subsec:ManuellesFahren}
-		Im Modus Manuelles Fahren kann das Fahrzeug konventionell über die originalen Carrera Handregler gesteuert
-		werden.
+		Im Modus Manuelles Fahren kann das Fahrzeug konventionell, über die originalen Carrera Handregler, gesteuert werden. Durch Betätigung des HMI-Tasters Auto, kann die Bahn in den Auto-Wait Zustand versetzt werden. 
 \newpage
 	\subsection{Automatisiertes Fahren}\label{subsec:bedAuto}
 		Der automatisierte Modus ist aufgeschlüsselt in zwei Zustände:
@@ -435,10 +434,10 @@ Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfl
 		Auto-Wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers, wechselt das Auto in den Auto-Run Zustand.
 		\subsubsection{Auto-Run}
-			Im Auto-Run Zustand fährt das Auto selbständig. Durch die Regelung der mittleren Geschwindigkeit des langsamen Streckenabschnitts, braucht das Auto einige Runden um die optimale Spannung, für diese Geschwindigkeit zu finden.
-
-			In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping in Streckenabschnitt 1 zusammengefasst.
-			Der Rest einer Runde (vor dem Looping bis zur Startlinie) bildet Streckenabschnitt 2.
+			Im Auto-Run Zustand fährt das Auto selbständig. Durch die Regelung der Geschwindigkeit des langsamen Streckenabschnitts, 
+			braucht das Auto einige Runden um die optimale Spannung, für diese Geschwindigkeit zu finden. Dies ist genauer in Abschnitt \ref{subsubsec:Tcontrol} beschrieben.
+			Es ist darauf zu achten, dass wenn das Auto im Looping herunterfällt, es wieder an der Startlinie eingesetzt wird. Ist dies nicht der Fall, 
+			ist weiterhin die erhöhte Geschwindigkeit aus dem Looping aktiv und das Auto verlässt in der nächsten Kurve erneut die Bahn. 
 \section{Ausschalten}
 Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens fünf Sekunden gedrückt zu halten.
 Nun muss der Nutzer warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne LED auf dem RaspberryPi nicht mehr blinkt und der Bildschirm in den Standby-Modus schaltet.
@@ -525,7 +524,7 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 			\hline
 			9 & -\\
 			\hline
-			10 & RXD Uart\\
+			10 & RXD UART\\
 			\hline
 			11$\rightarrow$40 & -\\
 			\hline
