@@ -40,7 +40,7 @@
 Die Carrera Bahn ist in Abbildung \ref{img:carrerakomplett} dargestellt. Sie ermöglicht es, zwei Autos gegeneinander antreten zu lassen. Dabei kann bei jedem Auto gewählt werden, ob es automatisch fährt oder durch einen Nutzer manuell gesteuert wird. Die Energieversorgung der jeweiligen Bahn kann unabhängig davon gewählt werden. Es ist dadurch zum Beispiel möglich, als Studierender ein Auto mit Netzstrom manuell, gegen ein automatisch fahrendes Auto, welches mit Solarstrom betrieben wird, zu steuern.
  Dies soll die Chancengleichheit der zwei Energieversorgungen demonstrieren. %
 
-\section{Zustand der Carrera Bahn vor der Projektarbeit}
+\section{Zustand der Carrera Bahn vor der Projektarbeit}\label{sec:before}
 Zu Beginn des Projekts ist die Carrera Bahn auf dem Stand, dass die Fahrzeuge schon konventionell sowie automatisiert betrieben werden können. Außerdem ist die Rundenzeitmessung und deren Visualisierung bereits realisiert. Bei der Energieversorgung kann zwischen Solarstrom und Netzversorgung gewählt werden.
 Die Solarstromversorgung wird pro Bahn durch 2 Solarpanels und einem Tiefsetzsteller mit konstantem Dutycycle hergestellt, die Netzstromversorgung mit einem 15V Schaltnetzteil.
 
@@ -142,9 +142,9 @@ Der Mikrocontroller ist mit 16MHz getaktet und wird direkt mit 5V aus dem Stecke
 		Dabei sind die Bahnen jeweils direkt an die Ausgänge der beiden TSS angeschlossen.
 	  Der Arduino generiert die zwei PWM Signal für die TSS.
 		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch den in Abschnitt \ref{subsubsec:Ucontrol} auf ihre aktuellen Sollwerte geregelt.
-		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs%HIEEEEEER ZAHLENWERT EINTRAGEN EVT MESSEN !!!
+		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs (21V\textsubscript{max})
 		nach oben hin begrenzt.
-		Da diese größer sein kann wie die Referenzspannung des ADC (interne Referenzspannung von 2.56V), wird sie über einen Spannungsteiler angepasst und kann damit auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt werden.
+		Da diese größer sein kann wie die Referenzspannung des ADC (V\textsubscript{ref}=V\textsubscript{CC} = 5V), wird sie über einen Spannungsteiler auf 5V\textsubscript{max} angepasst und auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt. Dies bewirkt die größtmögliche Aussteuerung des ADC ohne das dieser übersteuert wird.
 		Des Weiteren ist über ein Shunt eine Strommessung realisiert.
 		Dieser Stromwert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
 		verarbeitet und ist lediglich für weiterführende Projekte gedacht.
@@ -240,6 +240,7 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 					\label{tab:belegungTimer}
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
+			
 			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Sensor 0 ist nach Tabelle \ref{tab:belegungpcint} an PCINT16 angeschlossen. Aus dem Datenblatt des Mikrocontrollers (ATmega2560) geht hervor, dass für die Pin Chage Interrupts, drei Interruptvektoren vorgesehen sind. Dabei besteht eine Zuordnung von jeweils immer 8 PCINT Pins an einen Interruptvektor. Diese Zuordnung beginnt bei dem Pin PCINT0 und PCINT0\underline{}vect. Durch das Überfahren des Autos über den Sensor, wird also das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der Interrupt Service Routine (ISR) muss nun unterschieden werden, durch welchen Pin, das Interrupt ausgelöst wurde.
 			Die Lösung dieses Problems ist gegeben, indem der Signalpegel der PCINT Pins in der letzten ISR gesichert wurden. Nun wird das aktuelle Eingangsbyte des Ports mit dem zuvor gespeicherten bitweise exklusiv-oder verknüpft.
 Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt, von dem ersten zugeordneten Interruptpin des Bytes. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat.
@@ -289,9 +290,38 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 											& PCINT23 & Button: A-Manuell\\
 					\hline
 				\end{tabular}
-
 				\label{tab:belegungpcint}
 			\end{table}
+				\paragraph{Unterschied: Pin Change Interrupt - Polling mit echtzeitfähigem System - Polling ohne echtzeitfähigem System}
+					wie in Abbildung \ref{fig:rtPolling}dargestellt, gibt es zwei Möglichkeiten, ein wert diskretes Signal mit den gültigen Zuständen High oder Low zu digitalisieren.
+					Die erste Möglichkeit ist die zyklische Abfrage des Zustands. Dieses Verfahren wird in der Informatik Polling genannt.
+					Bei Polling ist zu beachten, dass das Abtasttheorem eingehalten wird. 
+					Dieses besagt, es muss mit mindestens der doppelten Frequenz des abzutastenden Signals abgetastet werden, 
+					anderenfalls kommt es zu Aliasing und es ist nicht mehr möglich, das abgetastete Signal ohne Informationsverlust zu rekonstruieren.
+					Da in einem nicht echtzeitfähigen Betriebssystem, wie zum Beispiel Raspian, nicht garantiert werden kann, 
+					dass die Signalabtastung lückenfrei, in äquidistanten Zeitabständen stattfindet,
+					ist die Einhaltung des Abtasttheorems und damit das Vermeiden von Aliasingfehlern nicht gesichert.
+					Ein solchen Fehler ist in Abbildung \ref{fig:rtPolling} mit der roten Datenreihe dargestellt. Hier ist einem anderen Prozess, 
+					innerhalb der zu detektierenden Signalflanke, Rechenzeit zugeteilt worden, sodass die Abtastung des Signals in dieser Zeit ausfällt.
+					Genau dieses Verhalten führt zu dem in Abschnitt \ref{sec:before} beschrieben entsprechenden Problem, dass Sensoren nicht zuverlässig detektiert wrden.
+
+					Eine Alternative zu Polling, stellt ein Abtasten der Signalflanken, durch eine Hardwareeinheit , wie sie in einem Atmega2560 integriert ist, dar.
+					Diese Hardwareeinheit tastet nun in dem Zeitabständen der Taktversorgung des Mikrocontrollers (in dieser Arbeit: 16MHz) das Signal ab, 
+					und löst bei jeder Änderung ein Hardwareinterrupt aus. Somit ist garantiert, dass die Flanken sicher erkannt werden. 
+					In der vorliegenden Projektarbeit sind deshalb Pin Change Interrupts in Verwendung, zuvor war dies nicht der Fall.  
+				\begin{figure}[ht]
+					\centering
+					\includegraphics[width=\textwidth]{rec/rtPolling.pdf}
+					\caption[Abtastung eines digitalen Signals]{Abtastprozess eines analog vorliegenden wertdiskreten Signals durch Softwarepolling mit echtzeitfähigem System, 
+ 					Softwarepolling ohne echtzeitfähigem System sowie Hardware Pin Change Interrupts.\\
+					Die schwarze Linie stellt ein abzutastendes Beispielsignal dar, wie es zum Beispiel von einem Bahnsensor zu erwarten wäre.
+					Die blauen Kreise stellen die Stützstellen einer zyklischen Abtastung eines echtzeitfähigem Systems, 
+					mit der vierfachen Abtastrate wie die Grundfrequenz des Signals, 
+					dar und die roten Vierecke die Stützstellen bei einem nicht echtzeitfähigen System mit verletztem Abtasttheorem im Bereich der zu detektierenden Flanken.
+					 }
+				\label{fig:rtPolling}
+				\end{figure}
+\FloatBarrier
 			\subsubsection{Analog Digital Converter Interrupt}\label{subsubsec:ADCINT}
 			Zum Betrieb des Zustandsautomats (Abbildung \ref{img:ADCMUX}) welcher den Multiplexer des ADC steuert ist ein Interrupt notwendig, welches ausgelöst wird, wenn der ADC eine Messung abgeschlossen hat. Dieser Automat ist genauer in Abschnitt \ref{subsec:ADC} beschrieben.
 
