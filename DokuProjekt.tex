@@ -1,6 +1,6 @@
 \documentclass[a4paper, 11pt]{report}
-\setcounter{tocdepth}{4}
-\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 \usepackage{a4}
 
 \usepackage{pdfpages}
@@ -13,6 +13,7 @@
 \usepackage[ngerman]{babel}
 \usepackage[font=small,labelfont=bf,margin=\parindent,tableposition=top]{caption}
 \usepackage{subcaption}
+\usepackage{setspace}
 
 \usepackage[colorlinks, pdfpagelabels, pdfstartview = FitH, bookmarksopen = true, bookmarksnumbered = true, linkcolor = black, plainpages = false, hypertexnames = false, citecolor = black, urlcolor = blue] {hyperref}
 \parindent 0pt
@@ -25,16 +26,19 @@
 \begin{document}
 \maketitle	%Deckblatt
 
-
+\begin{spacing}{0.9}
 \tableofcontents 	%Inhaltsverzeichnis
+
 \listoffigures		%Bildverzeichnis
+\listoftables
+\end{spacing}
 \newpage
 
 \chapter{Vorwort}%TITEL ÜBERARBEITEN
-	\begin{figure}[tb]
+	\begin{figure}[b]
 	\centering
 	\includegraphics[width=0.95\textwidth]{rec/Carrerabahnroh.png}
-	\caption[Überblick über die Carrera Bahn]{Überblick über die Carrera Bahn mit den Photovoltaik Modulen, der Steuerung mit dem Human Interface Device (HMI), sowie der Bahn mit den markierten Sensorpositionen.}
+	\caption[Überblick über die Carrera Bahn]{Überblick über die Carrera Bahn mit den Photovoltaik Modulen, der Steuerung mit dem Human Machine Interface (HMI), sowie der Bahn mit den markierten Sensorpositionen.}
 	\label{img:carrerakomplett}
 	\end{figure}
 Die Carrera Bahn ist in Abbildung \ref{img:carrerakomplett} dargestellt. Sie ermöglicht es, zwei Autos gegeneinander antreten zu lassen. Dabei kann bei jedem Auto gewählt werden, ob es automatisch fährt oder durch einen Nutzer manuell gesteuert wird. Die Energieversorgung der jeweiligen Bahn kann unabhängig davon gewählt werden. Es ist dadurch zum Beispiel möglich, als Studierender ein Auto mit Netzstrom manuell, gegen ein automatisch fahrendes Auto, welches mit Solarstrom betrieben wird, zu steuern.
@@ -44,16 +48,17 @@ Die Carrera Bahn ist in Abbildung \ref{img:carrerakomplett} dargestellt. Sie erm
 Zu Beginn des Projekts ist die Carrera Bahn auf dem Stand, dass die Fahrzeuge schon konventionell sowie automatisiert betrieben werden können. Außerdem ist die Rundenzeitmessung und deren Visualisierung bereits realisiert. Bei der Energieversorgung kann zwischen Solarstrom und Netzversorgung gewählt werden.
 Die Solarstromversorgung wird pro Bahn durch 2 Solarpanels und einem Tiefsetzsteller mit konstantem Dutycycle hergestellt, die Netzstromversorgung mit einem 15V Schaltnetzteil.
 
-Die manuelle Steuerung der Fahrzeuge durch den Nutzer ist realisiert, indem die klassischen Carrera Handregler, als variablen Vorwiderstand zu den Fahrzeugen eingesetzt werden. Im automatisierten Modus ist es möglich, mit je einem 5W Potentiometer die Geschwindigkeit des langsamen Streckenabschnittes einzustellen. In dem schnellen Steckenabschnitt (dem Looping) überbrückt ein Relais diesen Potentiometer und es liegt die volle Betriebsspannung, der jeweiligen Energieversorgung am Auto an.
+Die manuelle Steuerung der Fahrzeuge durch den Nutzer ist realisiert, indem die klassischen Carrera Handregler, als variablen Vorwiderstand zu den Fahrzeugen eingesetzt werden. 
+Im automatisierten Modus ist es möglich, mit je einem 5W Potentiometer, die Geschwindigkeit des langsamen Streckenabschnittes einzustellen. In dem schnellen Steckenabschnitt, dem Looping, überbrückt ein Relais diesen Potentiometer und es liegt die volle Betriebsspannung der jeweiligen Energieversorgung am Auto an.
 \newpage
 \section{Probleme der vorhandenen Carrera Bahn und Zielsetzung zur Projektarbeit}\label{sec:ziel}
 Der zuvor erwähnte Aufbau der vorhandenen Anlage vor der Projektarbeit weist einige Probleme auf:
-\begin{itemize}
-	\item{1.} Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt. (Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung eine unstabilisierte Quelle.)
-	\item{2.} Temperaturdrift des Widerstands des Potentiometers um den Arbeitspunkt im automatisierten Modus.
-	\item{3.} Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
-	\item{4.} Manchmal wird durch einen Aliasingeffekt das Überfahren eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten. (Echtzeitfähigkeit des Betriebssystems Raspian ist nicht gegeben)
-\end{itemize}
+\begin{enumerate}
+	\item Solarstromversorgung und Netzversorgung sind nicht chancengleich ausgeführt. (Die Netzversorgung stellt eine stabilisierte Spannungsquelle dar, die Solarstromversorgung eine unstabilisierte Quelle.)
+	\item Temperaturdrift des Widerstands des Potentiometers um den Arbeitspunkt im automatisierten Modus.
+	\item Framerate der Visualisierung ist zu gering, sodass diese immer die selbe Zahlensequenz nach dem Komma anzeigt.
+	\item Manchmal wird durch einen Aliasingeffekt das Überfahren eines Sensors in der Bahn nicht erkannt und die Geschwindigkeit wird nicht umgeschalten. (Echtzeitfähigkeit des Betriebssystems Raspian ist nicht gegeben)
+\end{enumerate}
 Die oben genannten Probleme sollen im Rahmen der Projektarbeit durch ein neues Steuer-/Regelkonzept, sowie einen Mikrocontroller mit echtzeitfähiger Software gelöst werden.
 
 
@@ -64,11 +69,11 @@ Die oben genannten Probleme sollen im Rahmen der Projektarbeit durch ein neues S
 	Bahn-B analog dazu funktioniert. Dazu wird immer wieder auf die Abbildung \ref{img:signalfluss}, sowie auf die \\Abbildung
 	\ref{img:carrerakomplett} Bezug genommen.\\
 	Die Sensoren in den Schienen teilen die Bahn in 3 Streckenabschnitte auf:
-	\begin{itemize}
-		\item{1.} Startlinie $\rightarrow$ Vor dem Looping
-		\item{2.} Vor dem Looping $\rightarrow$ Nach dem Looping
-		\item{3.} Nach dem Looping $\rightarrow$ Startlinie
-	\end{itemize}
+	\begin{enumerate}
+		\item Startlinie $\rightarrow$ Vor dem Looping
+		\item Vor dem Looping $\rightarrow$ Nach dem Looping
+		\item Nach dem Looping $\rightarrow$ Startlinie
+	\end{enumerate}
 	Auf Abschnitt 1 und Abschnitt 3 wird im automatisierten Modus die mittlere Geschwindigkeit des Autos geregelt.
 	Im Looping (Streckenbschnitt 2) wird die Spannung auf einen konstanten Wert geregelt.
 	Die Grenze dafür ist durch die Position der Sensoren festgelegt und somit nicht variabel.
@@ -76,7 +81,7 @@ Wie in Abbildung \ref{img:energiefluss} zu sehen ist, ist der Tiefsetzsteller (T
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/energiefluss.pdf}
-		\caption[Energiefluss einer Bahn]{Energiefluss einer Bahn.\\Durch einen Wechselschalter, kann der Nutzer zwischen den zwei Energieversorgungen 
+		\caption[Energiefluss einer Bahn]{Energiefluss einer Bahn.\\Durch einen Wechselschalter kann der Nutzer zwischen den zwei Energieversorgungen 
 			Photovoltaik (PV) und Netz wählen, oder die Versorgung komplett ausschalten. 
 			Der Tiefsetzsteller (TSS) ist dabei immer zwischen Energiequelle und dem Auto auf der Bahn geschaltet.}
 		\label{img:energiefluss}
@@ -84,13 +89,13 @@ Wie in Abbildung \ref{img:energiefluss} zu sehen ist, ist der Tiefsetzsteller (T
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.85\textwidth]{rec/signalfluss.pdf}
-		\caption[Signalflussbild der Steuerung]{Signalflussbild der Steuerung. \\Arduino liest Signale von Sensoren, sowie Tastern parallel aus und misst die Ausgangsspannung der Tiefsetzsteller (TSS) und Handregler. Auf Grundlage dieser Daten, generiert der Arduino die PWM Signale für die TSS und leitet die Sensordaten per Universal Asynchronous Receiver Transmitter (UART), an den RaspberryPi, zur Rundenzeitmessung weiter.}
+		\caption[Signalflussbild der Steuerung]{Signalflussbild der Steuerung. \\Der Arduino liest Signale von Sensoren, sowie Tastern parallel aus und misst die Ausgangsspannung der Tiefsetzsteller (TSS) und Handregler. Auf Grundlage dieser Daten generiert der Arduino die PWM Signale für die TSS und leitet die Sensordaten per Universal Asynchronous Receiver Transmitter (UART), an den RaspberryPi zur Rundenzeitmessung weiter.}
 		\label{img:signalfluss}
 	\end{figure}
 	
 	In Abbildung \ref{img:signalfluss} ist eine Übersicht über den Signalfluss der Carrera Bahn dargestellt.
 	Auf der Bahn stellt der Arduino das zentrale Element dar.
-	Dieser liest die Sensoren in den Schienen, sowie die Taster des Human Maschine Interfaces (HMI) parallel ein und gibt die Signale der LEDs, welche den aktuellen Zustand des jeweils aktiven Modus signalisieren, parallel aus.
+	Dieser liest die Sensoren in den Schienen, sowie die Taster des Human Machine Interfaces (HMI) parallel ein und gibt die Signale der LEDs, welche den aktuellen Zustand des jeweils aktiven Modus signalisieren, parallel aus.
 	Die analogen Größen (Ausgangsspannung TSS, Spannung über Strommessshunt TSS, Ausgangsspannung Spannungsteiler Handregler) sind an den Analog-Digital-Wandler (ADC) des Arduinos angeschlossen.
 	Der Arduino generiert außerdem die zwei PWM Signale, die von den Tiefsetzstellern benötigt werden, über einen 8-bit Hardwaretimer.
 	Dies ist genauer in Abschnitt \ref{subsec:PWM} beschrieben.
@@ -110,15 +115,15 @@ Wie in Abbildung \ref{img:energiefluss} zu sehen ist, ist der Tiefsetzsteller (T
 
 		Da die Flanke eines Sensors nur sehr kurz ist, lässt sich diese nicht per Polling ohne Aliasing Effekte digitalisieren. Stattdessen werden die Signale der Bahnsensoren durch Hardware Pin Change Interrupts (PCINT) des Arduino digitalisiert.
 		Die Funktionsweise dieser PCINTs ist genauer im Abschnitt \ref{subsubsec:PCINT} erklärt
-	\section{Human Maschine Interface}
-		\begin{figure}[ht]
+	\section{Human Machine Interface}
+		\begin{figure}[b]
 			\centering
 			\includegraphics[width=0.95\textwidth]{rec/hid.png}
 			\caption{HMI mit Arduino, RaspberryPi und TSS}
 
 			\label{img:hid}
 		\end{figure}
-		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Maschine Interface (HMI) aus drei Wechseltaster mit Mittelstellung, sowie einem Wechselschalter mit Mittelstellung.
+		Wie in Abbildung \ref{img:hid} dargestellt, besteht das Human Machine Interface (HMI) aus drei Wechseltastern mit Mittelstellung, sowie zwei Wechselschaltern mit Mittelstellung.
 
 		Der Wechselschalter (\glqq Wechselschalter 0\grqq{} für Bahn A und \glqq Wechselschalter 1\grqq{} für Bahn B ) ist zum Auswählen der Energieversorgung der jeweiligen Bahn. In der oberen Stellung wird die Bahn mit Netzenergie versorgt, in der unteren Stellung mit Solarenergie.
 Ist einer dieser Wechselschalter in Mittelstellung, wird die Bahn nicht versorgt und das entsprechende Auto steht, unabhängig des gewählten Modus.\\
@@ -129,8 +134,8 @@ Global existiert noch ein weiterer Taster um die Visualisierung (Rundenzeitmessu
 		Beim Arduino handelt es sich um einen Arduino Mega 2560 ADK.\\
 		Dieser ist mit einem ATmega2560 der Firma Microchip bestückt.
 		Der ATmega2560 ist perfekt für die Anwendung geeignet, da er einen Analog-Digital-Wandler (ADC) zur Messung analoger Größen, Hardwaretimer mit PWM Funktionalität, sowie  vier UARTs zur Kommunikation besitzt.
-Der Arduino kommt zum Einsatz, da er die Pins des Mikrocontrollers auf Buchsenleisten führt. So ist es unter anderem möglich, ohne größeren Aufwand, Drähte an die Pads der Buchsenleisten anzulöten. Außerdem enthält ein Arduino bereits alle zum Betrieb notwendigen Bauteile für den Mikrocontroller.
-Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung, oder der Glättungskondensator an der Referenzspannung des ADCs.
+Der Arduino kommt zum Einsatz, da er die Pins des Mikrocontrollers auf Buchsenleisten führt. So ist es unter anderem möglich, ohne größeren Aufwand, Drähte an die Pads der Buchsenleisten anzulöten, oder zu Demonstrationszwecken ein Oszilloskop anzuschließen. Außerdem enthält ein Arduino bereits alle zum Betrieb notwendigen Bauteile für den Mikrocontroller.
+Dies sind zum Beispiel die Abblockkondensatoren an der Versorgungsspannung oder der Glättungskondensator an der Referenzspannung des ADCs.
 Des Weiteren enthält der Arduino einen USB-Seriell Wandler, der genutzt werden kann, um sich Daten parallel zum Prozess an ein Terminal auszugeben.
 Dies ist zum Beispiel sehr hilfreich, um das Programm zu debuggen, oder die Regelparameter einzustellen.
 Der Mikrocontroller ist mit 16MHz getaktet und wird direkt mit 5V aus dem Steckernetzteil des RaspberryPi versorgt.
@@ -140,15 +145,14 @@ Der Mikrocontroller ist mit 16MHz getaktet und wird direkt mit 5V aus dem Stecke
 	\section{Tiefsetzsteller}
 		Die Tiefsetzsteller (TSS) fungieren als Stellglieder der Spannungsregelungen der Bahnen.
 		Dabei sind die Bahnen jeweils direkt an die Ausgänge der beiden TSS angeschlossen.
-	  Der Arduino generiert die zwei PWM Signal für die TSS.
-		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch den in Abschnitt \ref{subsubsec:Ucontrol} auf ihre aktuellen Sollwerte geregelt.
-		Die Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs (21V\textsubscript{max})
+	  Der Arduino generiert die zwei PWM Signale für die TSS.
+		Die Ausgangsspannung der TSS wird vom Arduino gemessen und durch den in Abschnitt \ref{subsubsec:Ucontrol} beschriebenen Regelkreis auf ihre aktuellen Sollwerte geregelt.
+		Die maximale Ausgangsspannung eines TSS ist lediglich durch die Leerlaufspannung eines PV-Strangs (21V\textsubscript{max})
 		nach oben hin begrenzt.
-		Da diese größer sein kann wie die Referenzspannung des ADC (V\textsubscript{ref}=V\textsubscript{CC} = 5V), wird sie über einen Spannungsteiler auf 5V\textsubscript{max} angepasst und auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt. Dies bewirkt die größtmögliche Aussteuerung des ADC ohne das dieser übersteuert wird.
+		Da diese größer sein kann als die Referenzspannung des ADC (V\textsubscript{ref}=V\textsubscript{CC} = 5V), wird sie über einen Spannungsteiler auf 5V\textsubscript{max} angepasst und auf einen Kanal des Analog-Digital-Wandlers des Mikrocontrollers geführt. Dies bewirkt die größtmögliche Aussteuerung des ADC ohne das dieser übersteuert wird.
 		Des Weiteren ist über ein Shunt eine Strommessung realisiert.
 		Dieser Stromwert liegt zwar im Arduino digital vor, wird allerdings nicht weiter
 		verarbeitet und ist lediglich für weiterführende Projekte gedacht.
-
 \chapter{Software}
 	\section{RaspberryPi}\label{sec:SoftPi}
 		Bei der Software, die auf dem RaspberryPi ausgeführt wird, handelt es sich um ein Python Skript.
@@ -161,9 +165,10 @@ Der Mikrocontroller ist mit 16MHz getaktet und wird direkt mit 5V aus dem Stecke
 	\section{Arduino}
 		Die Software des Arduinos ist nicht in der Arduino Entwicklungsumgebung geschrieben, da dies einen direkten Zugriff auf die Hardware erschwert und der Programmablauf bereits vorgegeben wäre.
 		Stattdessen ist die Software in der integrierten Entwicklungsumgebung (IDE) \glqq Atmelstudio 7.0\grqq{} entwickelt.
-		Der Bootloader des Arduino wurde dazu entfernt.
-		Dies ermöglicht nun einen direkten Zugriff auf die Prozessorregister und damit Konfiguration der einzelnen Komponenten des Mikrocontrollers, auf dem Arduino.
-		Dies ist notwendig, um das Timing des Controllers exakt zu steuern und ist effizienter als für alle Hardwarekomponenten eine Bibliothek zu nutzen , wie es die Arduino Entwicklungsumgebung vorsehen würde.
+		Der Bootloader des Arduino ist entfernt.
+		Das ermöglicht nun einen direkten Zugriff auf die Prozessorregister und damit Konfiguration der einzelnen Komponenten des Mikrocontrollers auf dem Arduino.
+		Dias ist notwendig, um das Timing des Controllers exakt zu steuern und ist effizienter als für alle Hardwarekomponenten eine Bibliothek zu nutzen wie es die Arduino Entwicklungsumgebung vorsehen würde.
+\newpage
 		\subsection{Interrupts}
 		\begin{figure}[ht]
 			\centering
@@ -241,19 +246,25 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 				\end{table}
 			\subsubsection {Pin Change Interrupt}\label{subsubsec:PCINT}
 			
-			Wenn ein Auto auf, beispielsweise Sensor 0 (Bahn A, am Start), fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Sensor 0 ist nach Tabelle \ref{tab:belegungpcint} an PCINT16 angeschlossen. Aus dem Datenblatt des Mikrocontrollers (ATmega2560) geht hervor, dass für die Pin Chage Interrupts, drei Interruptvektoren vorgesehen sind. Dabei besteht eine Zuordnung von jeweils immer 8 PCINT Pins an einen Interruptvektor. Diese Zuordnung beginnt bei dem Pin PCINT0 und PCINT0\underline{}vect. Durch das Überfahren des Autos über den Sensor, wird also das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. In der Interrupt Service Routine (ISR) muss nun unterschieden werden, durch welchen Pin, das Interrupt ausgelöst wurde.
-			Die Lösung dieses Problems ist gegeben, indem der Signalpegel der PCINT Pins in der letzten ISR gesichert wurden. Nun wird das aktuelle Eingangsbyte des Ports mit dem zuvor gespeicherten bitweise exklusiv-oder verknüpft.
-Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt, von dem ersten zugeordneten Interruptpin des Bytes. So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat.
-In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werden:
+			Wenn ein Auto auf beispielsweise Sensor 0 (Bahn A, an der Startlinie) fährt, wird der Pegel kurze Zeit \emph{Low} und nach Verlassen des Sensors wieder \emph{High}.\\ Sensor 0 ist nach Tabelle \ref{tab:belegungpcint} an PCINT16 angeschlossen. 
+			Aus dem Datenblatt des Mikrocontrollers (ATmega2560) geht hervor, dass für die Pin Change Interrupts drei Interruptvektoren vorgesehen sind. 
+			Dabei besteht eine Zuordnung von jeweils immer acht PCINT Pins an einen Interruptvektor. 
+			Diese Zuordnung beginnt bei dem Pin PCINT0 und PCINT0\underline{}vect. 
+			Durch das Überfahren des Autos über den Sensor wird also das letzte Pin Change Interrupt, PCINT2\underline{ }vect, zweimal ausgelöst. 
+			In der Interrupt Service Routine (ISR) muss nun unterschieden werden durch welchen Pin das Interrupt ausgelöst wurde.
+			Die Lösung dieses Problems ist gegeben, indem der Signalpegel der PCINT Pins in der letzten ISR gesichert werden. Nun wird das aktuelle Eingangsbyte des Ports mit dem zuvor gespeicherten bitweise exklusiv-oder verknüpft.
+			Ist das Ergebnis der Verknüpfung nicht \glqq 0\grqq, entspricht die Stelle der logischen \glqq 1\grqq im Byte, der Nummer des PCINT Pins gezählt, von dem ersten zugeordneten Interruptpin des Bytes. 
+			So ist das Ergebnis der exklusiv-oder Verknüpfung dieses Beispiels mit Sensor 0: $00000001$ da sich das nullte Bit verändert hat.
+			In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werden:
 				\begin{itemize}
 					\item \emph{High$\rightarrow$Low} Übergang
 					\item \emph{Low$\rightarrow$High} Übergang
 				\end{itemize}
 			Hat ein \emph{High$\rightarrow$Low} Übergang stattgefunden, wird ein Event erzeugt und je nach PCINT Pin unterschiedlich behandelt.
-			Bei einem \emph{Low$\rightarrow$High} Übergang, kann das Ereignis verworfen werden.
+			Bei einem \emph{Low$\rightarrow$High} Übergang kann das Ereignis verworfen werden.
 
-			Das Entprellen des Eingangs ist implementiert, indem nach dem Auslösen eines Events, die PCINT Funktion für den zugehörigen Pin deaktiviert wird, sodass dieser das Interrupt nicht mehr auslösen kann. Zusätzlich wird ein Softwaretimer gestartet, der die PCINT Funktion des Pins, nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Überfahren des Sensors, das dementsprechende Event nur einmal triggert.
-			Analog zu dem Sensor 0, ist dies für jeden Sensor sowie Taster implementiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
+			Das Entprellen des Eingangs ist implementiert, indem nach dem Auslösen eines Events, die PCINT Funktion für den zugehörigen Pin deaktiviert wird, sodass dieser das Interrupt nicht mehr auslösen kann. Zusätzlich wird ein Softwaretimer gestartet, der die PCINT Funktion des Pins, nach dessen Ablauf wieder aktiviert. Mit diesem einfachen Prinzip wird sichergestellt, dass das Auto beim Überfahren des Sensors das dementsprechende Event nur einmal triggert.
+			Analog zu dem Sensor 0 ist dies für jeden Sensor sowie Taster implementiert. Die Belegung der benutzten Pin Change Interrupts kann Tabelle \ref{tab:belegungpcint} entnommen werden.
 			\begin{table}[ht]
 				\caption{Belegung der Pin Change Interrupts}
 				\begin{tabular}{|l|l|l|}
@@ -292,8 +303,8 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 				\end{tabular}
 				\label{tab:belegungpcint}
 			\end{table}
-				\paragraph{Unterschied: Pin Change Interrupt - Polling mit echtzeitfähigem System - Polling ohne echtzeitfähigem System}
-					wie in Abbildung \ref{fig:rtPolling}dargestellt, gibt es zwei Möglichkeiten, ein wert diskretes Signal mit den gültigen Zuständen High oder Low zu digitalisieren.
+				\paragraph{Unterschied: Pin Change Interrupt - Polling mit echtzeitfähigem System - Polling ohne echtzeitfähigem System}\mbox{}\\
+					Wie in Abbildung \ref{fig:rtPolling} dargestellt, gibt es zwei Möglichkeiten, ein wertdiskretes Signal mit den gültigen Zuständen High oder Low zu digitalisieren.
 					Die erste Möglichkeit ist die zyklische Abfrage des Zustands. Dieses Verfahren wird in der Informatik Polling genannt.
 					Bei Polling ist zu beachten, dass das Abtasttheorem eingehalten wird. 
 					Dieses besagt, es muss mit mindestens der doppelten Frequenz des abzutastenden Signals abgetastet werden, 
@@ -303,11 +314,13 @@ In der ISR muss nun weiter, zwischen den zwei Möglichkeiten, unterschieden werd
 					ist die Einhaltung des Abtasttheorems und damit das Vermeiden von Aliasingfehlern nicht gesichert.
 					Ein solchen Fehler ist in Abbildung \ref{fig:rtPolling} mit der roten Datenreihe dargestellt. Hier ist einem anderen Prozess, 
 					innerhalb der zu detektierenden Signalflanke, Rechenzeit zugeteilt worden, sodass die Abtastung des Signals in dieser Zeit ausfällt.
-					Genau dieses Verhalten führt zu dem in Abschnitt \ref{sec:before} beschrieben entsprechenden Problem, dass Sensoren nicht zuverlässig detektiert wrden.
+					Genau dieses Verhalten führt zu dem in Abschnitt \ref{sec:before} beschrieben Problem, dass Sensoren nicht zuverlässig detektiert werden.
 
-					Eine Alternative zu Polling, stellt ein Abtasten der Signalflanken, durch eine Hardwareeinheit , wie sie in einem Atmega2560 integriert ist, dar.
-					Diese Hardwareeinheit tastet nun in dem Zeitabständen der Taktversorgung des Mikrocontrollers (in dieser Arbeit: 16MHz) das Signal ab, 
-					und löst bei jeder Änderung ein Hardwareinterrupt aus. Somit ist garantiert, dass die Flanken sicher erkannt werden. 
+\newpage
+					Eine Alternative zu Polling, stellt ein Abtasten der Signalflanken durch eine Hardwareeinheit wie sie in einem Atmega2560 integriert ist dar.
+					Diese Hardwareeinheit tastet nun in den Zeitabständen der Taktversorgung des Mikrocontrollers (in dieser Arbeit: 16MHz) das Signal ab 
+					und löst bei jeder Änderung ein Hardwareinterrupt aus. 
+					Somit ist garantiert, dass die Flanken sicher erkannt werden. 
 					In der vorliegenden Projektarbeit sind deshalb Pin Change Interrupts in Verwendung, zuvor war dies nicht der Fall.  
 				\begin{figure}[ht]
 					\centering
