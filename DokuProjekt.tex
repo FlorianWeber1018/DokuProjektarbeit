@@ -178,7 +178,7 @@ Der Mikrocontroller ist mit 16MHz getaktet und wird direkt mit 5V aus dem Stecke
 		\end{figure}
 Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildung \ref{InterruptgesteuerterProgrammablauf}.
 			Dies hat den Vorteil, dass das Timing nicht mehr von der Länge der MainLoop abhängt und Vorgänge wie zum  Beispiel der Regelalgorithmus immer mit der selben Frequenz ausgeführt werden.
-			In der Mainloop des Programms werden zeitunkritische Aufgaben erledigt, wie die LEDs der HMI zu aktualisieren.
+			In der Mainloop des Programms werden zeitunkritische Aufgaben erledigt, wie die LEDs des HMI zu aktualisieren.
 			Interruptquellen des Programms sind:
 			\begin{itemize}
 				\item Timer  (Abschnitt \ref{subsubsec:Timer})
@@ -328,9 +328,9 @@ Der Programmablauf ist interruptgesteuert und folgt damit dem Modell in Abbildun
 					\caption[Abtastung eines digitalen Signals]{Abtastprozess eines analog vorliegenden wertdiskreten Signals durch Softwarepolling mit echtzeitfähigem System, 
  					Softwarepolling ohne echtzeitfähigem System sowie Hardware Pin Change Interrupts.\\
 					Die schwarze Linie stellt ein abzutastendes Beispielsignal dar, wie es zum Beispiel von einem Bahnsensor zu erwarten wäre.
-					Die blauen Kreise stellen die Stützstellen einer zyklischen Abtastung eines echtzeitfähigem Systems, 
+					Die blauen Kreise stellen die Stützstellen einer zyklischen Abtastung eines echtzeitfähigem Systems 
 					mit der vierfachen Abtastrate wie die Grundfrequenz des Signals, 
-					dar und die roten Vierecke die Stützstellen bei einem nicht echtzeitfähigen System mit verletztem Abtasttheorem im Bereich der zu detektierenden Flanken.
+					dar und die roten Vierecke die Stützstellen bei einem nicht echtzeitfähigen System, mit verletztem Abtasttheorem im Bereich der zu detektierenden Flanken.
 					 }
 				\label{fig:rtPolling}
 				\end{figure}
@@ -351,20 +351,20 @@ Zusammen bilden die zwei Regelkreise im automatisierten Modus eine Kaskadenregel
 				\caption[Regelkreis Bahnspannung]{Regelkreis Bahnspannung.\\Die Soll-Spannung wird je nach aktiven Modus der Bahn vorgegeben.
 				Die Ist-Spannung der jeweiligen Bahn wird mit dem ADC gemessen und die Regelabweichung errechnet.
 				Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Spannung} verstärkt und auf den I-Regler gegeben.
-				Dieser erzeugt Den Dutycycle der auf den TSS gegeben wird.
+				Dieser erzeugt den Dutycycle der auf den TSS gegeben wird.
 				TSS erzeugt Bahnspannung.}
 				\label{fig:Ucontrol}
 			\end{figure}
 			Um Schwankungen in der Energieversorgung auszugleichen, sowie das Steuern der Bahnspannung zu ermöglichen, 
 			ist eine Spannungsregelung nach Abbildung \ref{fig:Ucontrol} implementiert.
-			Die Ist-Spannung der jeweiligen Bahn wird zyklisch mittels des ADCs gemessen. Jedes mal wenn ein neuer Wert der Bahnspannung von Bahn-A vorliegt, 
+			Die Ist-Spannung der jeweiligen Bahn wird zyklisch mittels des ADCs gemessen. Jedes Mal wenn ein neuer Wert der Bahnspannung von Bahn-A vorliegt, 
 			wird die Funktion  \emph{i\_control\_voltage\_a} (siehe Quellcode)  aufgerufen. Die Funktion kann nun die Regeldifferenz \glqq e\grqq{} bilden und 
 			diese mit dem Faktor \glqq K\textsubscript{Spannung}\grqq{} verstärken.
 			Der I-Regler (einfacher digitaler Integrator mit der Differenzengleichung $y[k]=y[k-1]+x[k]$) integriert diese verstärkte Regelabweichung auf und 
 			generiert damit den Dutycycle für den TSS, bei dem sich dann eine neue Ausgangsspannung (U\textsubscript{Bahn}) entsprechend des neuen Dutycycle einstellt. 
 			Diese neue Spannung wird wieder gemessen und die Funktion wird erneut aufgerufen.
-			Als Regler ist ein digitaler I-Regler in Verwendung, da Die Strecke (TSS) kein freier Integrator besitzt. 
-			Jedoch braucht ein Regelkreis mindestens ein freien Integrator um stationäre Genauigkeit aufzuweisen.
+			Als Regler ist ein digitaler I-Regler in Verwendung, da die Strecke (TSS) kein freier Integrator besitzt. 
+			Jedoch braucht ein Regelkreis mindestens einen freien Integrator, um stationäre Genauigkeit bei einer sprungartigen Sollwertänderung, aufzuweisen.
 			Zusätzlich zu dem gerade eben beschriebenen Regelalgorithmus, ist die Ausgangsgröße des I-Reglers nach oben (maximal 200/255), 
 			sowie unten (minimal 10/255) begrenzt. Dies ist notwendig da der TSS jenseits eines Dutycycle von 200, bei einer weiteren Erhöhung, 
 			nicht mehr eine höhere Ausgangsspannung liefert und das Auto sich unter einem Dutycycle von 10 noch nicht bewegt. 
@@ -378,28 +378,29 @@ Zusammen bilden die zwei Regelkreise im automatisierten Modus eine Kaskadenregel
 				Die Zeit in Streckenabschnitt 3 (zwischen dem Ende des Loopings und der Startlinie) wird mit einem Softwaretimer gemessen und mit der Sollzeit verglichen.
 				Die resultierende Regelabweichung wird mit dem konstanten Faktor K\textsubscript{Geschwindigkeit} verstärkt und auf den I-Regler gegeben.
 				Dieser erzeugt daraus die Soll-Spannung für die jeweilige Bahn und gibt diese an den inneren Regelkreis (Regelkreis Spannung, Abbildung \ref{fig:Ucontrol}) weiter.
-				Dieser geneneriert daraus die Ist-Spannung die am Auto anliegt. Daraus ergibt sich eine neue Zeit für den Streckenabschnitt 3.}
+				Dieser geneneriert daraus die Ist-Spannung, die am Auto anliegt. Daraus ergibt sich eine neue Zeit für den Streckenabschnitt 3.}
 				\label{fig:Tcontrol}
 			\end{figure}
 			Da die Carrera Bahn mit verschiedenen Fahrzeugen betrieben werden kann und somit die Modellparameter nicht konstant sind (zum Beispiel Reibungsverluste im Fahrzeug, allgemein Motor), ist es notwendig die Soll-Spannung im automatisierten Modus auf den langsamen Streckenabschnitten anzupassen. Hierzu ist ein Regler nach Abbildung \ref{fig:Tcontrol} implementiert. Dabei wird die Zeit gemessen, welche das Auto benötigt, um die Strecke zwischen dem Sensor nach dem Looping bis zum Sensor an der Startlinie zu fahren.
-Für diese Zeit ist im Arduino eine konstante Soll-Zeit hinterlegt. Jedes mal wenn ein neuer Messwert für die Zeit auf diesem Streckenabschnitt vorliegt, wird die Funktion 
-\emph{i\_control\_railspeed\_a}  (siehe Quellcode)  aufgerufen und darin die  Regeldifferenz \glqq e\grqq{} bilden. Analog zu dem Regelkreis in Abschnitt \ref{subsubsec:Ucontrol}, wird auch hier die Regeldifferenz gebildet und mit dem Faktor K\textsubscript{Geschwindigkeit} skaliert. Als Regler kommt ein I-Regler wie in Abschnitt \ref{subsubsec:Ucontrol} zum Einsatz. Die so erzeugte Stellgröße U\textsubscript{Soll} wird nun auf das Stellglied (innerer Regelkreis Bahnspannung aus Abschnitt \ref{subsubsec:Ucontrol}) gegeben und es ergibt sich durch eine neue Bahnspannung auch eine neue Zeit für den gemessenen Streckenabschnitt. In der nächsten Runde wiederholt sich der Kreis.\\
-Um Fehler die durch kurzzeitige externe Störungen verursacht werden abzufangen hat man die Änderung von U\textsubscript{Soll} begrenzt.
+Für diese Zeit ist im Arduino eine konstante Soll-Zeit hinterlegt. Jedes Mal wenn ein neuer Messwert für die Zeit auf diesem Streckenabschnitt vorliegt, wird die Funktion 
+\emph{i\_control\_railspeed\_a}  (siehe Quellcode)  aufgerufen und darin die  Regeldifferenz \glqq e\grqq{} gebildet. Analog zu dem Regelkreis in Abschnitt \ref{subsubsec:Ucontrol}, wird auch hier die Regeldifferenz gebildet und mit dem Faktor K\textsubscript{Geschwindigkeit} skaliert. Als Regler kommt ein I-Regler, wie in Abschnitt \ref{subsubsec:Ucontrol}, zum Einsatz. Die so erzeugte Stellgröße U\textsubscript{Soll} wird nun auf das Stellglied (innerer Regelkreis Bahnspannung, Abschnitt \ref{subsubsec:Ucontrol}, Abbildung \ref{fig:Ucontrol}) gegeben und es ergibt sich durch eine neue Bahnspannung auch eine neue Zeit für den gemessenen Streckenabschnitt. In der nächsten Runde wiederholt sich der Kreis.\\
+Um Fehler, die durch kurzzeitige externe Störungen verursacht werden, abzufangen ist die maximale Änderungsrate von U\textsubscript{Soll} nach oben hin begrenzt.
 Solche Störungen wären zum Beispiel wenn das Auto in dem Streckenabschnitt zwischen dem Looping und der Startlinie festgehalten wird oder herausfällt.
 Dies führt dazu, dass das Auto ein paar Runden mehr braucht, um seinen stationären Endwert in der Geschwindigkeit zu finden, allerdings macht es die Regelung insgesamt robuster.
 Der in diesem Abschnitt beschriebene Regelalgorithmus ist ausschließlich im automatisierten Modus einer Bahn aktiv.
-Durch ein Wechsel des Modus aus dem Modus Auto-Run (sie Abschnitt \ref{subsec:bedAuto}) in einen anderen Modus, bleibt der aktuelle Wert des Integrators erhalten, sodass das Auto beim nächsten mal, vorausgesetzt das Auto ist dasselbe, mit der richtigen Geschwindigkeit startet.
-		\FloatBarrier
-	\newpage
+\newpage
+Durch einen Wechsel des Modus aus dem Modus Auto-Run (siehe Abschnitt \ref{subsec:bedAuto}) in einen anderen Modus bleibt der aktuelle Wert des Integrators erhalten, sodass das Auto beim nächsten Wechsel in den Modus Auto-Run, vorausgesetzt die zu Beginn erwähnten Modellparameter haben sich nicht zu sehr geändert, bereits mit der richtigen Geschwindigkeit startet.
+Ist dies nicht erwünscht ist der Regler, nach der Bedienungsanleitung in Kapitel \ref{cha:manual}, zurückzusetzen.
+\FloatBarrier		
+	
 	\subsection{Analog Digital Wandler}\label{subsec:ADC}
 
-		Der Mikrocontroller des Arduinos (Atmega2560) hat bereits einen 10-bit Analog Digital Converter (ADC) auf dem Chip integriert, sodass auf einen externen Wandler, verzichtet wird.
-		Da der Wandler immer nur eine Messung durchführen kann, hat der Hersteller einen Multiplexer (MUX) integriert, um zwischen den einzelnen ADC Pins (Kanälen), des Mikrocontrollers durchzuschalten.
+		Der Mikrocontroller des Arduinos (Atmega2560) hat bereits einen 10-bit Analog Digital Converter (ADC) auf dem Chip integriert, sodass auf einen externen Wandler verzichtet wird.
+		Da der Wandler immer nur eine Messung durchführen kann, hat der Hersteller einen Multiplexer (MUX) integriert, um zwischen den einzelnen ADC Pins (Kanälen) des Mikrocontrollers durchzuschalten.
 		Die Belegung der ADC Pins ist in Tabelle \ref{tab:AnhangBelegungArduino} enthalten.
 
 		Immer wenn die angestoßene Messung des ADC abgeschlossen ist, wird ein Interrupt ausgelöst.
-
-		Die Steuerung des MUX erfolgt über ein Zustandsautomat (siehe Abbildung \ref{img:ADCMUX}), der immer dann ein Schritt weiter springt, wenn dieses Interrupt eintritt. In jedem Schritt des Automats, wird schematisch dasselbe durchgeführt:
+		Die Steuerung des MUX erfolgt über einen Zustandsautomaten (siehe Abbildung \ref{img:ADCMUX}), der immer dann ein Schritt weiter springt, wenn dieser Interrupt eintritt. In jedem Schritt des Automaten, wird schematisch dasselbe durchgeführt:
 		\begin{itemize}
 		\item	Letzter gemessener Wert in zugehörige Variable speichern
 		\item Nächste Messung vorbereiten (Multiplexer steuern und Messung anstoßen)
@@ -408,7 +409,7 @@ Durch ein Wechsel des Modus aus dem Modus Auto-Run (sie Abschnitt \ref{subsec:be
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.3\textwidth]{rec/ADCAutomat.pdf}
-			\caption[Zustandsautomat des MUX im ADC]{Zustandsautomat des MUX im ADC.\\Die Zustände(S0 bis S1) beschreiben, welcher ADC Pin des Mikrocontrollers gerade durch den MUX mit dem ADC verbunden ist. Die Transitionsbedingung (links) beschreibt das Ereignis, mit dem man von einem Zustand in den Nächsten wechselt. Ein Punkt markiert den Schritt in den Initialzustand (S0) des Automats und ein Pfeil einen Sprung zu einem darunter definierten Zustand.}
+			\caption[Zustandsautomat des MUX im ADC]{Zustandsautomat des MUX im ADC.\\Die Zustände S0 bis S1  beschreiben, welcher ADC Pin des Mikrocontrollers gerade durch den MUX mit dem ADC verbunden ist. Die Transitionsbedingung (links) beschreibt das Ereignis, mit dem man von einem Zustand in den Nächsten wechselt. Ein Punkt markiert den Schritt in den Initialzustand (S0) des Automaten und ein Pfeil einen Sprung zu einem darunter definierten Zustand.}
 			\label{img:ADCMUX}
 		\end{figure}
 
@@ -433,24 +434,24 @@ Durch ein Wechsel des Modus aus dem Modus Auto-Run (sie Abschnitt \ref{subsec:be
 
 
 Wie aus Abbildung \ref{fig:PWMGENFX} hervorgeht, ist das PWM Signal direkt eine Funktion des aktuellen Zählerstands von Timer0, sowie dem Inhalt des jeweiligen Overflow Compare Registers OCR0A/B.
-Die PWM Generierung ist durch den Mikrocontroller in Hardware implementiert und muss lediglich aktiviert werden. Die Konfiguration dieser PWM Generierung ist in der Funktion initTimer implementiert und wird einmal zu Programmstart aufgerufen. Der Hardwaretimer setzt nun den jeweiligen Pin beim Überlauf des 8-bit Timers (Wert 0) auf High-Pegel und beim Erreichen des Wertes im OCR0AB Registers ( zum Beispiel  bei DutyCycle = 50\% OCR0A = 127 ) auf Low-Pegel.
+Die PWM Generierung ist durch den Mikrocontroller in Hardware implementiert und muss lediglich aktiviert werden. Die Konfiguration dieser PWM Generierung ist in der Funktion initTimer implementiert und wird einmal zu Programmstart aufgerufen. Der Hardwaretimer setzt nun den jeweiligen Pin beim Überlauf des 8-bit Timers (Wert 0) auf High-Pegel und beim Erreichen des Wertes im OCR0AB Registers (zum Beispiel  bei DutyCycle = 50\% OCR0A = 127) auf Low-Pegel.
 Dieses Verhalten des Hardwaretimers ist zur Veranschaulichung nochmal in Abbildung  \ref{fig:PWMGENAut} als Zustandsautomat dargestellt.
 
 
 \chapter{Bekannte Störungen}\label {cha:err}
 Gelegentlich fallen Autos im Looping herunter.
-Durch längere Tests und Analyse der Fehlerbilder, hat sich herausgestellt, dass dies kein Problem der Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrera Bahn.
-Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfläche versenkt und der Übergang zwischen den zusammengesteckten Streckenstücken weist einen unstetigen Verlauf auf. Dadurch ergibt sich eine Diskontinuität des Stroms, durch den Antrieb des Fahrzeugs im Looping. Dies führt zu Geschwindigkeitsverlust , sowie letztendlich zum Absturz des Fahrzeugs. Werden nun, um die schlechte mechanische Beschaffenheit auszugleichen,  die Strombürsten des Fahrzeugs weiter in Richtung Schiene gebogen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nicht mehr verlässlich.
+Durch längere Tests und Analyse der Fehlerbilder hat sich herausgestellt, dass dies kein Problem der Regelung selbst darstellt, sondern vielmehr der schlechten Qualität der zugekauften Carrera Bahn.
+Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfläche versenkt und der Übergang zwischen den zusammengesteckten Streckenstücken weist einen unstetigen Verlauf auf. Dadurch ergibt sich eine Diskontinuität des Stroms, durch den Antrieb des Fahrzeugs im Looping. Dies führt zu Geschwindigkeitsverlust, sowie letztendlich zum Absturz des Fahrzeugs. Werden nun, um die schlechte mechanische Beschaffenheit auszugleichen,  die Strombürsten des Fahrzeugs weiter in Richtung Schiene gebogen, taucht die Führungsnase nicht mehr weit genug in die Bahn ein und das Fahrzeug fliegt aus der Kurve oder triggert die Sensoren nicht mehr verlässlich.
 
-\chapter{Bedienungsanleitung}
+\chapter{Bedienungsanleitung}\label{cha:manual}
 %evt bild von visu
 \section{Einschalten}
-	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald die Anlage Spannung hat, bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist die Carrera Bahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
+	Die Anlage muss zum Einschalten lediglich mit der Netzversorgung verbunden werden. Sobald die Anlage Spannung hat bootet der RaspberryPi selbständig und startet die Visualisierung. Ab diesem Punkt ist die Carrera Bahn betriebsbereit und im Modus manuelles Fahren (Abschnitt \ref{subsec:ManuellesFahren}).
 \section{Betrieb}
 	\begin{figure}[ht]
 		\centering
 		\includegraphics[width=0.5\textwidth]{rec/modiAuswahl.pdf}
-		\caption[Zustandsautomat zum Wechsel der Betriebsmodi einer Bahn]{Zustandsautomat zum Wechsel der Betriebsmodi einer Bahn.\\Durch den \glqq HMI Taster Auto\grqq{} der jeweiligen Bahn, kann der Nutzer immer in den \glqq Auto-Wait\grqq{} Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus, kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand{} (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell\grqq{}, die Bahn in den manuellen Modus versetzten und das entsprechende Auto mit dem Handregler konventionell steuern.}
+		\caption[Zustandsautomat zum Wechsel der Betriebsmodi einer Bahn]{Zustandsautomat zum Wechsel der Betriebsmodi einer Bahn.\\Durch den \glqq HMI Taster Auto\grqq{} der jeweiligen Bahn kann der Nutzer immer in den \glqq Auto-Wait\grqq{} Zustand (S1) wechseln, in dem das Auto hält. Von diesem Zustand aus kann der Nutzer die Bahn durch Betätigung des Handreglers, in den \glqq Auto-Run\grqq Zustand{} (S2) versetzten und das Auto fährt anschließend selbständig. Aus jedem Zustand kann der Nutzer mit dem \glqq HMI Taster Manuell\grqq{} die Bahn in den manuellen Modus versetzten und das entsprechende Auto mit dem Handregler konventionell steuern.}
 		\label{img:Betriebsmodi}
 	\end{figure}
 	Die Carrera Bahn beherrscht 2 Modi.
@@ -458,13 +459,14 @@ Genauer ist die Stromschiene der Bahn im Looping ein wenig in der Fahrbahnoberfl
 		\item Manuelles Fahren
 		\item Automatisiertes Fahren
 	\end{itemize}
-	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass es zum Beispiel möglich ist, manuell gegen ein automatisiertes Fahrzeug anzutreten. Die Wahl eines dementsprechenden Modus (automatisiert oder manuell), wird durch eine LED über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert. Außerdem kann die Energieversorgung jeder Bahn mit dem entsprechenden Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der zwei Streckenabschnitte, sowie die Rundenzeit angezeigt.
+	Die Modi können unabhängig voneinander auf beiden Bahnen gewählt werden, sodass es zum Beispiel möglich ist, manuell gegen ein automatisiertes Fahrzeug anzutreten. Die Wahl eines dementsprechenden Modus (automatisiert oder manuell), wird durch eine LED über, beziehungsweise unter, des jeweiligen Tasters des gewählten Modus signalisiert.
+Der Wechsel zwischen den Modi findet nach Abbildung \ref{img:Betriebsmodi} statt und ist in den jeweiligen Abschnitten genauer erklärt. Außerdem kann die Energieversorgung jeder Bahn mit dem entsprechenden Wechselschalter ausgewählt werden. Unabhängig des gewählten Modus, wird in der Visualisierung die Zeit der zwei Streckenabschnitte, sowie die Rundenzeit angezeigt.
 In der Visualisierung ist die Strecke von der Startlinie bis vor den Looping in Streckenabschnitt 1 zusammengefasst.
 			Der Rest einer Runde (vor dem Looping bis zur Startlinie) bildet Streckenabschnitt 2.
-Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
-	Der Wechsel zwischen den Modi findet nach Abbildung \ref{img:Betriebsmodi} statt und ist in den jeweiligen Abschnitten genauer erklärt.
+Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch. Ein neues Rennen kann gestartet werden indem der Taster \glqq Reset Visualisierung \grqq{} (siehe Abbildung \ref{img:hid}) des HMI gedrückt wird.
+Der Regler der Bahngeschwindigkeit der jeweiligen Bahn kann mit dem Wechseltaster 1 des HMI zurückgesetzt werden. 
 	\subsection{Manuelles Fahren}\label{subsec:ManuellesFahren}
-		Im Modus Manuelles Fahren kann das Fahrzeug konventionell, über die originalen Carrera Handregler, gesteuert werden. Durch Betätigung des HMI-Tasters Auto, kann die Bahn in den Auto-Wait Zustand versetzt werden. 
+		Im Modus manuelles Fahren kann das Fahrzeug konventionell, über die originalen Carrera Handregler, gesteuert werden. Durch Betätigung des HMI Tasters Auto kann die Bahn in den Auto-Wait Zustand versetzt werden.
 \newpage
 	\subsection{Automatisiertes Fahren}\label{subsec:bedAuto}
 		Der automatisierte Modus ist aufgeschlüsselt in zwei Zustände:
@@ -477,23 +479,23 @@ Nach 30 Runden ist das Rennen vorbei und die Visualisierung wird statisch.
 		Auto-Wait und das Auto steht.
 		Durch kurzes durchdrücken des zugehörigen Handreglers, wechselt das Auto in den Auto-Run Zustand.
 		\subsubsection{Auto-Run}
-			Im Auto-Run Zustand fährt das Auto selbständig. Durch die Regelung der Geschwindigkeit des langsamen Streckenabschnitts, 
-			braucht das Auto einige Runden um die optimale Spannung, für diese Geschwindigkeit zu finden. Dies ist genauer in Abschnitt \ref{subsubsec:Tcontrol} beschrieben.
-			Es ist darauf zu achten, dass wenn das Auto im Looping herunterfällt, es wieder an der Startlinie eingesetzt wird. Ist dies nicht der Fall, 
+			Im Auto-Run Zustand fährt das Auto selbständig. Durch die Regelung der Geschwindigkeit des langsamen Streckenabschnitts
+			braucht das Auto einige Runden, um die optimale Spannung für die Geschwindigkeit zu finden. Dies ist genauer in Abschnitt \ref{subsubsec:Tcontrol} beschrieben.
+			Es ist darauf zu achten, dass wenn das Auto im Looping herunterfällt, es wieder vor der Startlinie eingesetzt wird. Ist dies nicht der Fall, 
 			ist weiterhin die erhöhte Geschwindigkeit aus dem Looping aktiv und das Auto verlässt in der nächsten Kurve erneut die Bahn. 
 \section{Ausschalten}
-Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster am HMI (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens fünf Sekunden gedrückt zu halten.
+Um die Anlage ordnungsgemäß herunterzufahren, ist der Reset Taster der Visualisierung (Abbildung \ref{img:hid} - Reset Visualisierung) mindestens fünf Sekunden gedrückt zu halten.
 Nun muss der Nutzer warten bis der RaspberryPi komplett heruntergefahren ist. Dies ist daran zu erkennen, dass die grüne LED auf dem RaspberryPi nicht mehr blinkt und der Bildschirm in den Standby-Modus schaltet.
 \chapter{Reflexion}
 
 Die zu Beginn, in Abschnitt \ref{sec:ziel} definierten Probleme der vorhandenen Carrera Bahn, sind durch das neue Steuer-/Regelkonzept, sowie eine neue Hardware Architektur, fast alle beseitigt.\\
 Da nun unabhängig der gewählten Energiequelle, die Bahnspannung immer durch die Tiefsetzsteller erzeugt und geregelt wird, ist diese nicht mehr von der eigentlichen Quelle abhängig.
 Somit stellt nun auch die Solarenergieversorgung eine stabilisierte Spannungsquelle dar (siehe Abschnitt \ref{subsubsec:Ucontrol}).\\
-Der Temperaturdrift, des in der vorherigen Bahn eingesetzten variablen Widerstands, ist behoben, da dieser in der neuen Anlage, durch die Möglichkeit die Bahnspannung durch den Dutycycle der Tiefsetzsteller anzupassen, nicht mehr benötigt wird. (siehe Abbildung \ref{img:energiefluss})\\
+Der Temperaturdrift des in der vorherigen Bahn eingesetzten variablen Widerstands ist behoben, da dieser in der neuen Anlage, durch die Möglichkeit die Bahnspannung durch den Dutycycle der Tiefsetzsteller anzupassen, nicht mehr benötigt wird. (siehe Abbildung \ref{img:energiefluss})\\
 Die Framerate der Visualisierung wurde angehoben, indem immer nur der dynamische Bildinhalt (die Rundenzeiten) neu gerendert wird (siehe Abschnitt \ref{sec:SoftPi}). Dies reduziert die Rechenzeit pro Frame.\\
 Die Probleme mit Aliasing beim Auslesen der Sensoren sind durch den Einsatz der \glqq Pin Change Interrupts\grqq{} des Arduinos zum Digitalisieren der Sensorsignale vollständig behoben (siehe Abschnitt \ref{subsubsec:PCINT}).\\
 
-Ein bestehendes Problem der Carrera Bahn ist, das gelegentlich ein Auto im Looping herunterfällt, wenn dieses automatisch fährt. Die Ursache dessen wurde identifiziert (siehe Abschnitt \ref{cha:err}), kann allerdings nicht mit vertretbarem Aufwand gelöst werden.
+Ein bestehendes Problem der Carrera Bahn ist, dass gelegentlich ein Auto im Looping herunterfällt, wenn dieses automatisch fährt. Die Ursache dessen wurde identifiziert (siehe Abschnitt \ref{cha:err}), kann allerdings nicht mit vertretbarem Aufwand gelöst werden.
 
 Insgesamt wird die Projektarbeit vom Autor als Erfolg angesehen.
 \chapter{Quellenverzeichnis}
@@ -668,8 +670,6 @@ Scout1. (September 2004). Interrupt Programme.gif – Mikrocontroller.net.
 
 	\clearpage
 	\includepdf[pages=-,landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/CarreraBahn.pdf}
-	%\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/2.pdf}
-	%\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/3.pdf}
-	%\includepdf[landscape=true,trim=0cm 0cm 0cm 0cm,clip]{rec/schematic/4.pdf}
+
 
 \end{document}
